@@ -146,14 +146,11 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="1.1.0";
+const APP_VERSION="1.2.0";
 const KEY="glowquest_v1";
-const DEFAULT_CATS=[{id:"sommeil",name:"Sommeil",pts:20},{id:"sport",name:"Sport",pts:20},{id:"objectifs",name:"Objectifs",pts:15},{id:"calme",name:"Calme",pts:10},
- {id:"soin",name:"Soin de soi",pts:10},{id:"nutrition",name:"Nutrition et eau",pts:10},{id:"journal",name:"Journal et humeur",pts:5},{id:"detox",name:"Détox écran",pts:5},{id:"lien",name:"Plaisir et lien social",pts:5}];
-const SQ=["Boire un grand verre d'eau au réveil","Faire 15 squats","Marcher 10 min dehors","Faire ton lit","Ranger 5 objets qui traînent","Envoyer un message gentil",
- "5 min d'étirements","Lire 10 pages","Manger 1 fruit","2 min de respiration guidée","Écrire 1 gratitude","Prendre l'air 5 min sans téléphone",
- "Écouter 1 chanson qui fait du bien","Préparer tes affaires pour demain","Masque ou soin du visage","Téléphone hors de la chambre ce soir","Gainage 30 s",
- "Boire 1 tisane au calme","Noter 1 victoire du jour","Prendre les escaliers","Trier tes notifications","Danser sur 1 chanson","Te coucher 15 min plus tôt"].map((t,i)=>({id:"q"+i,t}));
+const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
+const M_PER_DAY=5,M_PTS=20;
+const SQ=["Boire un grand verre d'eau au réveil","Faire ton lit","Faire 15 squats","Gainage 30 s","Prendre les escaliers au lieu de l'ascenseur","2 min d'étirements du dos","Manger un fruit au goûter","Remplir ta gourde pour la journée","Ouvrir les fenêtres 5 min","Ranger 5 objets qui traînent","Vider et ranger ton sac","Arroser une plante","Sourire à 3 personnes","Envoyer un message gentil","Dire merci à quelqu'un","Écouter une chanson qui fait du bien","Danser sur une chanson","Écrire 1 gratitude","Noter 1 victoire du jour","1 min de respiration 4 s / 6 s","Regarder le ciel 2 min sans téléphone","Trier tes notifications","Supprimer 10 photos inutiles","Préparer ta tenue de demain","Téléphone hors de la chambre ce soir","Masque ou soin du visage","Crème pour les mains","Boire une tisane au calme","Lire 1 page d'un livre","Apprendre 1 mot nouveau"].map((t,i)=>({id:"q"+i,t}));
 const WQ=[["3 matins sans téléphone",3],["Essayer un nouveau sport",1],["5 jours avec 1,5 L d'eau",5],["2 promenades de 30 min",2],["4 soirs couchée avant 23 h",4],
  ["3 séances de sport complètes",3],["Cuisiner 2 nouveaux repas",2],["1 soirée sans écran",1],["Appeler 2 proches",2],["5 journaux d'humeur",5]];
 const LEAGUES=[["Bronze",0],["Argent",350],["Or",600],["Platine",850],["Diamant",1100],["Légende",1400]];
@@ -535,18 +532,21 @@ function load(){
  if(!S||!S.days)S={created:today(),cats:JSON.parse(JSON.stringify(DEFAULT_CATS)),settings:{},days:{},weeks:{}};
  S.weeks=S.weeks||{};S.settings=Object.assign({threshold:60,compet:true,sound:true},S.settings||{});
  if((S.v||0)<3){S.v=3;S.spent=0;S.owned=[DEF_WEAR.hair,DEF_WEAR.outfit,DEF_WEAR.shoes,"a_none"];S.wear=Object.assign({},DEF_WEAR);delete S.skin}
+ if((S.v||0)<4){S.v=4;S.cats=JSON.parse(JSON.stringify(DEFAULT_CATS))}
  S.owned=S.owned||[];S.wear=Object.assign({},DEF_WEAR,S.wear||{});S.spent=S.spent||0;
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));storageOK=true}catch(e){storageOK=false}}
-const sumPts=()=>S.cats.reduce((a,c)=>a+(+c.pts||0),0)||1;
-function dayRec(k){if(!S.days[k])S.days[k]={m:{},sq:{},sqList:null,rr:0,j:["","",""],mood:null,rest:false};const r=S.days[k];if(k===today()){r.max=sumPts();r.n=S.cats.length}return r}
+const sumPts=()=>100;
+const mName=id=>{const c=S.cats.find(x=>x.id===id);return c?c.name:(DEFAULT_CATS.find(x=>x.id===id)||{name:id}).name};
+function dayRec(k){if(!S.days[k])S.days[k]={m:{},sq:{},sqList:null,rr:0,j:["","",""],mood:null,rest:false};const r=S.days[k];if(k===today()){r.max=100;r.n=M_PER_DAY}return r}
+function mList(k){const r=dayRec(k);if(!r.ml||r.ml.some(id=>!S.cats.find(c=>c.id===id)&&!(r.m[id]&&r.m[id].s>0))){const R=rng(hash(k+"#m"+(r.mr||0))),pool=S.cats.map(c=>c.id),out=[];while(out.length<Math.min(M_PER_DAY,pool.length))out.push(pool.splice(Math.floor(R()*pool.length),1)[0]);r.ml=out;save()}return r.ml}
 function sqList(k){const r=dayRec(k);if(!r.sqList){const R=rng(hash(k+"#"+r.rr)),pool=SQ.map(q=>q.id),out=[];while(out.length<3)out.push(pool.splice(Math.floor(R()*pool.length),1)[0]);r.sqList=out;save()}return r.sqList}
 function weekQuest(wk){const w=S.weeks[wk]||(S.weeks[wk]={n:0,doneDate:null});const q=WQ[hash("wq"+wk)%WQ.length];return{w,t:q[0],target:q[1]}}
 
 /* ===================== MOTEUR ===================== */
 const multFor=s=>s>=30?3:s>=14?2:s>=7?1.5:s>=3?1.2:1;
 function score(r){if(!r)return{pct:0,perfect:false};let e=0,full=0;for(const id in r.m){const x=r.m[id];if(x.s===2){e+=x.pts;full++}else if(x.s===1)e+=x.pts/2}
- return{pct:Math.min(100,Math.round(e/(r.max||sumPts())*100)),perfect:full>=(r.n||S.cats.length)&&full>0}}
+ return{pct:Math.min(100,Math.round(e/(r.max||sumPts())*100)),perfect:full>=(r.n||M_PER_DAY)&&full>0}}
 const cumXP=n=>50*n*(n-1);function levelOf(xp){let n=1;while(cumXP(n+1)<=xp)n++;return n}
 const titleOf=lv=>TITLES.filter(t=>lv>=t[0]).pop()[1];
 function compute(){
@@ -604,7 +604,7 @@ function bubbleText(){
 const stage=(w,h)=>`<div class="stage" id="stage"><div class="ava" id="ava">${charSVG(w,h)}</div><div class="bubble" id="bubble">${esc(bubbleText())}</div></div>`;
 
 function vMissions(){
- const r=dayRec(today()),t=C.today,thr=+S.settings.threshold||60,comp=S.settings.compet,combo=t.success?t.mult:multFor(C.streak+1);
+ const ml=mList(today()),r=dayRec(today()),t=C.today,thr=+S.settings.threshold||60,comp=S.settings.compet,combo=t.success?t.mult:multFor(C.streak+1);
  return `<div class="hero">${stage(S.wear,150)}
   <div class="card" style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:6px;padding-top:28px">
    <div class="row sb"><div class="score">${t.pct}<small> / 100 pts</small></div>${comp&&combo>1?`<span class="tag" style="background:linear-gradient(180deg,#ff9cc8,var(--pink));color:#2a0d1d">Combo x${dec(combo)}</span>`:""}</div>
@@ -612,10 +612,10 @@ function vMissions(){
    <div class="chips"><span class="chip">Série <b>${C.streak} j</b></span><span class="chip">Rec. <b>${C.best} j</b></span><span class="chip">30 j <b>${C.succ30} %</b></span></div>
    <div class="row sb" data-act="rest"><span class="sm dim b">Jour de repos (+${REST_PTS} pts)</span><span class="sw ${r.rest?"on":""}"></span></div>
   </div></div>
- <div class="row sb" style="flex:none"><span class="ttl">Missions du jour</span><span class="sm dim b">+${COIN_MAIN} <i class="coin" style="width:10px;height:10px;vertical-align:-1px"></i> chacune</span></div>
- <div class="list">${S.cats.map(c=>{const e=r.m[c.id]||{s:0};const cls=e.s===2?"done":e.s===1?"part":"";
-  return `<div class="mrow ${cls}" data-act="toggle" data-v="${c.id}"><span class="ck">${ICK}</span><span class="mname">${esc(c.name)}</span>${e.s===1&&e.note?INOTE:""}
-   <span class="pts">${e.s===1?Math.round(c.pts/2)+"/":""}${c.pts} pts</span><button class="more" data-act="detail" data-v="${c.id}">${IDOTS}</button></div>`}).join("")}</div>`;
+ <div class="row sb" style="flex:none"><span class="ttl">Missions du jour</span><span class="row" style="gap:8px"><span class="sm dim b">+${COIN_MAIN} <i class="coin" style="width:10px;height:10px;vertical-align:-1px"></i> chacune</span><button class="btn alt" style="padding:5px 9px;font-size:10px;box-shadow:0 3px 0 #1d1540" data-act="mreroll" ${(r.mr||0)>=1||ml.some(id=>r.m[id]&&r.m[id].s>0)?"disabled":""}>Relancer ${(r.mr||0)>=1?0:1}</button></span></div>
+ <div class="list">${ml.map(id=>{const e=r.m[id]||{s:0};const cls=e.s===2?"done":e.s===1?"part":"";
+  return `<div class="mrow ${cls}" data-act="toggle" data-v="${id}" style="max-height:64px"><span class="ck">${ICK}</span><span class="mname" style="white-space:normal;line-height:1.2">${esc(mName(id))}</span>${e.s===1&&e.note?INOTE:""}
+   <span class="pts">${e.s===1?M_PTS/2+"/":""}${M_PTS} pts</span><button class="more" data-act="detail" data-v="${id}">${IDOTS}</button></div>`}).join("")}</div>`;
 }
 function vQuetes(){
  const T=today(),r=dayRec(T),list=sqList(T),any=list.some(id=>r.sq[id]);const{w,t,target}=weekQuest(C.curWk);const L=C.league,keep=L>0?LEAGUES[L][1]:LEAGUES[1][1];
@@ -654,7 +654,8 @@ function vShop(){
 function vStats(){
  const T=today(),last7=C.order.filter(d=>d>=addDays(T,-6));
  const rate=id=>last7.length?Math.round(100*last7.reduce((a,d)=>{const e=C.days[d].rec&&C.days[d].rec.m[id];return a+(e?e.s===2?1:e.s===1?.5:0:0)},0)/last7.length):0;
- const r7=S.cats.map(c=>[c.name,rate(c.id)]).sort((a,b)=>b[1]-a[1]);
+ const seen={};last7.forEach(d=>{const rc=C.days[d].rec;if(rc&&rc.ml)rc.ml.forEach(id=>{const e=rc.m[id];seen[id]=seen[id]||[0,0];seen[id][0]++;seen[id][1]+=e?e.s===2?1:e.s===1?.5:0:0})});
+ let r7=Object.keys(seen).map(id=>[mName(id),Math.round(100*seen[id][1]/seen[id][0])]).sort((a,b)=>b[1]-a[1]);if(!r7.length)r7=[["Aucune mission",0]];
  return `<div class="tiles">
   <div class="tile"><b style="color:#ff9f55">${C.streak} j</b><span>Série</span></div><div class="tile"><b style="color:var(--gold)">${C.best} j</b><span>Record</span></div><div class="tile"><b style="color:var(--mint)">${C.succ30} %</b><span>Validés 30 j</span></div>
   <div class="tile"><b style="color:var(--pink)">${C.perf30} %</b><span>Parfaits 30 j</span></div><div class="tile"><b style="color:var(--vio)">${C.reg30} %</b><span>Régularité</span></div><div class="tile"><b>${nf(C.total)}</b><span>XP totale</span></div></div>
@@ -688,7 +689,7 @@ function moodLow(){const T=today();let ds=[T,addDays(T,-1),addDays(T,-2)];if(!(S
 function sheet(html){document.getElementById("sheetIn").innerHTML=html;document.getElementById("sheet").classList.add("on")}
 function closeSheet(){stopBreath();document.getElementById("sheet").classList.remove("on");document.getElementById("sheetIn").innerHTML=""}
 function vDetail(id){
- const c=S.cats.find(x=>x.id===id),e=dayRec(today()).m[id]||{s:0,note:""};
+ const c={name:mName(id),pts:M_PTS},e=dayRec(today()).m[id]||{s:0,note:""};
  sheet(`<div class="row sb" style="margin-bottom:14px"><span class="b" style="font-size:17px">${esc(c.name)}</span><span class="pts">${c.pts} pts</span></div>
  <div class="row" style="gap:7px;margin-bottom:14px">
   <button class="btn ${e.s===2?"m":"alt"}" style="flex:1;padding:10px 4px" data-act="setS" data-v="${id}" data-s="2">Validé</button>
@@ -700,14 +701,14 @@ function vDetail(id){
  <button class="btn v" style="width:100%;margin-top:12px" data-act="close">Fermer</button>`);
 }
 function vSettings(){
- const s=S.settings,tot=S.cats.reduce((a,c)=>a+(+c.pts||0),0);
+ const s=S.settings;
  sheet(`<div class="row sb" style="margin-bottom:14px"><span class="b" style="font-size:17px">Réglages</span><button class="btn alt" data-act="close">Fermer</button></div>
  <div class="row sb" data-act="sound" style="margin-bottom:12px"><span class="b">Bruitages</span><span class="sw ${s.sound?"on":""}"></span></div>
  <div class="row sb" data-act="compet" style="margin-bottom:12px"><div><div class="b">Mode compétition</div><div class="sm dim">Combo, ligue, alerte de série</div></div><span class="sw ${s.compet?"on":""}"></span></div>
  <div class="ttl" style="margin-bottom:5px">Seuil pour valider le jour (pts sur 100)</div><input type="number" min="10" max="100" data-set="threshold" value="${s.threshold}" style="margin-bottom:14px">
- <div class="ttl" style="margin-bottom:8px">Missions et points</div>
- ${S.cats.map((c,i)=>`<div class="catrow"><input type="text" data-cat="${i}" data-f="name" value="${esc(c.name)}"><input type="number" min="1" max="100" data-cat="${i}" data-f="pts" value="${c.pts}"><button data-act="catdel" data-v="${i}">X</button></div>`).join("")}
- <div class="row sb" style="margin:6px 0 16px"><span class="sm dim">Total <span id="tot">${tot}</span> pts (ramené sur 100 pts)</span><button class="btn alt" data-act="catadd">Ajouter</button></div>
+ <div class="ttl" style="margin-bottom:8px">Liste des missions</div>
+ ${S.cats.map((c,i)=>`<div class="catrow" style="grid-template-columns:1fr 32px"><input type="text" data-cat="${i}" data-f="name" value="${esc(c.name)}"><button data-act="catdel" data-v="${i}">X</button></div>`).join("")}
+ <div class="row sb" style="margin:6px 0 16px"><span class="sm dim">${S.cats.length} missions, ${M_PER_DAY} tirées par jour (${M_PTS} pts chacune)</span><button class="btn alt" data-act="catadd">Ajouter</button></div>
  <div class="ttl" style="margin-bottom:5px">Sauvegarde</div><div class="sm dim" style="margin-bottom:10px">Données stockées sur ce téléphone uniquement.</div>
  <div class="row" style="gap:7px"><button class="btn m" data-act="export">Exporter</button><button class="btn alt" data-act="import">Importer</button><button class="btn red" data-act="reset">Effacer</button></div>
  <div class="sm dim" style="margin-top:14px;text-align:center">Glow Quest v${APP_VERSION}</div>`);
@@ -759,7 +760,7 @@ function act(fn,ev,kind){
 }
 
 /* ===================== EVENEMENTS ===================== */
-function setStatus(id,s){const r=dayRec(today()),c=S.cats.find(x=>x.id===id),e=r.m[id]||{s:0,note:""};e.s=s;e.pts=+c.pts;r.m[id]=e}
+function setStatus(id,s){const r=dayRec(today()),e=r.m[id]||{s:0,note:""};e.s=s;e.pts=M_PTS;r.m[id]=e}
 document.addEventListener("click",ev=>{
  const el=ev.target.closest("[data-act]");if(!el)return;const a=el.dataset.act,v=el.dataset.v,T=today();ac();
  if(a==="detail"){ev.stopPropagation();SFX.tap();vDetail(v);return}
@@ -774,6 +775,7 @@ document.addEventListener("click",ev=>{
   case"rest":{const r=dayRec(T),used=Object.keys(S.days).some(d=>d!==T&&weekKey(d)===weekKey(T)&&S.days[d].rest);
    if(!r.rest&&used){fx={anim:"sad",say:"Déjà pris cette semaine",sound:"err"};render();break}act(()=>{r.rest=!r.rest},ev,r.rest?"un":"rest");break}
   case"sq":{const r=dayRec(T),on=!!r.sq[v];act(()=>{if(on)delete r.sq[v];else r.sq[v]=true},ev,on?"un":"quest");break}
+  case"mreroll":act(()=>{const r=dayRec(T);r.mr=(r.mr||0)+1;r.ml=null;mList(T)},ev,"part");break;
   case"reroll":act(()=>{const r=dayRec(T);r.rr=(r.rr||0)+1;r.sqList=null;r.sq={}},ev,"part");break;
   case"wq":{const q=weekQuest(C.curWk),was=!!q.w.doneDate;act(()=>{q.w.n=Math.max(0,Math.min(q.target,q.w.n+(+v)));if(q.w.n>=q.target&&!q.w.doneDate)q.w.doneDate=T;else if(q.w.n<q.target)q.w.doneDate=null},ev,+v>0?"part":"un");
    if(!was&&q.w.doneDate){SFX.perfect();overlay("QUÊTE ACCOMPLIE",`+${COIN_WQ} pièces . +${WQ_XP} XP`,S.wear)}break}
@@ -787,21 +789,21 @@ document.addEventListener("click",ev=>{
    if(it.r>=2){const w=Object.assign({},S.wear);fx.over=[it.r===3?"LÉGENDAIRE !":"ÉPIQUE !",it.name,w];fx.overDelay=500}render();break}
   case"equip":S.wear[ITEM[v].cat]=v;save();fx={anim:"spin",sparks:10,sound:"equip"};render();break;
   case"compet":S.settings.compet=!S.settings.compet;save();SFX.tap();vSettings();break;
-  case"catdel":if(S.cats.length>1&&confirm("Supprimer cette mission ?")){S.cats.splice(+v,1);dayRec(T);save();vSettings()}break;
-  case"catadd":S.cats.push({id:"c"+Date.now().toString(36),name:"Nouvelle mission",pts:5});dayRec(T);save();SFX.tap();vSettings();break;
+  case"catdel":if(S.cats.length>M_PER_DAY&&confirm("Supprimer cette mission ?")){S.cats.splice(+v,1);dayRec(T);save();vSettings()}break;
+  case"catadd":S.cats.push({id:"c"+Date.now().toString(36),name:"Nouvelle mission"});dayRec(T);save();SFX.tap();vSettings();break;
   case"export":{const b=new Blob([JSON.stringify(S)],{type:"application/json"}),u=URL.createObjectURL(b),l=document.createElement("a");l.href=u;l.download="glowquest-sauvegarde-"+T+".json";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);break}
   case"import":document.getElementById("importFile").click();break;
   case"reset":if(confirm("Effacer toute la progression ?")&&confirm("Action définitive. Confirmer ?")){try{localStorage.removeItem(KEY)}catch(e){}S=null;load();save();closeSheet();render()}break;
  }
 });
 document.getElementById("sheet").addEventListener("click",ev=>{if(ev.target.id==="sheet"){closeSheet();render()}});
-function autoJournal(){const r=dayRec(today()),c=S.cats.find(x=>x.id==="journal");if(c&&r.mood&&r.j.every(l=>l.trim()))r.m.journal={s:2,note:"",pts:+c.pts}}
+function autoJournal(){const r=dayRec(today());if((r.ml||[]).includes("journal")&&r.mood&&r.j.every(l=>l.trim()))r.m.journal={s:2,note:"",pts:M_PTS}}
 document.addEventListener("input",ev=>{
  const t=ev.target,T=today();
- if(t.dataset.note){const r=dayRec(T),id=t.dataset.note;if(!r.m[id]){const c=S.cats.find(x=>x.id===id);r.m[id]={s:0,note:"",pts:+c.pts}}r.m[id].note=t.value;save()}
+ if(t.dataset.note){const r=dayRec(T),id=t.dataset.note;if(!r.m[id])r.m[id]={s:0,note:"",pts:M_PTS};r.m[id].note=t.value;save()}
  else if(t.dataset.j!=null){dayRec(T).j[+t.dataset.j]=t.value;save()}
  else if(t.dataset.set){S.settings.threshold=Math.max(10,Math.min(100,+t.value||60));save()}
- else if(t.dataset.cat!=null){const c=S.cats[+t.dataset.cat],f=t.dataset.f;c[f]=f==="pts"?Math.max(1,Math.min(100,+t.value||1)):t.value;dayRec(T);save();const e=document.getElementById("tot");if(e)e.textContent=S.cats.reduce((a,c)=>a+(+c.pts||0),0)}
+ else if(t.dataset.cat!=null){const c=S.cats[+t.dataset.cat],f=t.dataset.f;c[f]=t.value;dayRec(T);save();const e=document.getElementById("tot");if(e)e.textContent=S.cats.reduce((a,c)=>a+(+c.pts||0),0)}
 });
 document.getElementById("importFile").addEventListener("change",ev=>{
  const f=ev.target.files[0];if(!f)return;const rd=new FileReader();

@@ -5,7 +5,7 @@ App de bien-être en mode jeu, installable sur téléphone (PWA), hors ligne, sa
 ## Mise en ligne (une seule fois)
 1. Déposer tous les fichiers de ce dossier à la racine du dépôt (Add file > Upload files > Commit).
 2. Settings > Pages > Source : "Deploy from a branch", branche `main`, dossier `/ (root)` > Save.
-3. Attendre 1 à 2 min, puis ouvrir https://nolangoncalves44-spec.github.io/Glow-Quest/
+3. Attendre 1 à 2 min, puis ouvrir https://nolangoncalves44-spec.github.io/Glow-Quest/ (respecter les majuscules)
 4. Sur le téléphone (Chrome) : menu > "Installer l'application" ou "Ajouter à l'écran d'accueil".
 
 ## Mise à jour
