@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="1.7.0";
+const APP_VERSION="1.8.0";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -909,10 +909,10 @@ function installBtn(){
   b.onclick=doInstall;document.body.appendChild(b)}
 }
 async function doInstall(){
- if(!isIOS){sheet(`<div class="b" style="font-size:17px;margin-bottom:10px">Installer Glow Quest</div>
-  <a class="btn g" style="display:block;text-align:center;text-decoration:none;margin-bottom:10px" href="${APK_URL}">Télécharger l'app Android</a>
+ if(!isIOS){prepPack();sheet(`<div class="b" style="font-size:17px;margin-bottom:10px">Installer Glow Quest</div>
+  <a class="btn g" style="display:block;text-align:center;text-decoration:none;margin-bottom:10px" href="${APK_URL}" onclick="copyPack()">Télécharger l'app Android</a>
   <div class="sm dim" style="line-height:1.5;margin-bottom:12px">Ouvre le fichier GlowQuest.apk téléchargé. Si Android le demande, autorise l'installation depuis Chrome (une seule fois), puis Installer.</div>
-  <button class="btn m" style="width:100%;margin-bottom:10px" data-act="sendapp">Une fois installée : transférer ma progression</button>
+  <div class="sm dim" style="margin-bottom:10px">Ta progression sera récupérée automatiquement à la première ouverture de l'app.</div>
   ${installEvt?`<button class="btn alt" style="width:100%" data-act="pwainst">Ou version web légère</button>`:""}
   <button class="btn v" style="width:100%;margin-top:10px" data-act="close">Fermer</button>`);return}
  if(installEvt){installEvt.prompt();const r=await installEvt.userChoice;installEvt=null;if(r.outcome==="accepted"){const b=document.getElementById("instBtn");if(b)b.remove()}return}
@@ -927,17 +927,20 @@ addEventListener("appinstalled",()=>{installEvt=null;const b=document.getElement
 const isAndroid=/android/i.test(navigator.userAgent);
 async function packSave(){const st=new Blob([JSON.stringify(S)]).stream().pipeThrough(new CompressionStream("gzip"));const u=new Uint8Array(await new Response(st).arrayBuffer());let b="";for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
 async function unpackSave(t){t=t.replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";const b=atob(t),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);const st=new Blob([u]).stream().pipeThrough(new DecompressionStream("gzip"));return JSON.parse(await new Response(st).text())}
+let packCache=null;
+function prepPack(){packSave().then(p=>{packCache=p}).catch(()=>{})}
+function copyPack(){try{if(packCache&&navigator.clipboard)navigator.clipboard.writeText("GLOWQUEST:"+packCache)}catch(e){}}
 async function sendToApp(){try{const p=await packSave();location.href=`intent://transfer#Intent;scheme=glowquest;package=fr.lina3d.glowquest;S.data=${p};S.browser_fallback_url=${encodeURIComponent(APK_URL)};end`}catch(e){toast("Transfert impossible")}}
 const isFresh=()=>!Object.values(S.days).some(r=>Object.keys(r.m||{}).length||Object.keys(r.sq||{}).length||r.mood)&&S.owned.length<=4;
 let pendingImport=null;
 window.gqImport=async t=>{try{const d=await unpackSave(t);if(!d.days||!d.cats)throw 0;pendingImport=d;
  if(isFresh())doImport();else sheet(`<div class="b" style="font-size:17px;margin-bottom:8px">Progression reçue</div><div class="sm dim" style="margin-bottom:14px">Remplacer la progression de l'app par celle du navigateur ?</div><button class="btn m" style="width:100%" data-act="doimport">Remplacer</button><button class="btn alt" style="width:100%;margin-top:10px" data-act="close">Garder celle de l'app</button>`)}catch(e){toast("Transfert impossible")}};
 function doImport(){if(!pendingImport)return;S=pendingImport;pendingImport=null;save();load();save();S.settings.transferAsked=true;save();closeSheet();render();remSync();overlay("PROGRESSION RÉCUPÉRÉE","Tout est là, bon jeu !",S.wear);SFX.level()}
-function vRealApp(){S.settings.realAsked=true;save();
- sheet(`<div class="b" style="font-size:17px;margin-bottom:6px">Installe la vraie app</div><div class="sm dim" style="margin-bottom:14px">Rappels fiables même app fermée. Ta progression te suit.</div>
- <a class="btn g" style="display:block;text-align:center;text-decoration:none" href="${APK_URL}">1. Télécharger l'app Android</a>
+function vRealApp(){S.settings.realAsked=true;save();prepPack();
+ sheet(`<div class="b" style="font-size:17px;margin-bottom:6px">Installe la vraie app</div><div class="sm dim" style="margin-bottom:14px">Rappels fiables même app fermée. Ta progression est récupérée automatiquement à la première ouverture.</div>
+ <a class="btn g" style="display:block;text-align:center;text-decoration:none" href="${APK_URL}" onclick="copyPack()">1. Télécharger l'app Android</a>
  <div class="sm dim" style="margin:8px 0 12px">Ouvre GlowQuest.apk puis Installer (autorise Chrome si Android le demande).</div>
- <button class="btn m" style="width:100%" data-act="sendapp">2. Transférer ma progression</button>
+ <button class="btn alt" style="width:100%" data-act="sendapp">Si la progression n'arrive pas : transférer</button>
  <button class="btn alt" style="width:100%;margin-top:10px" data-act="close">Plus tard</button>`)}
 function vTransferAsk(){S.settings.transferAsked=true;save();
  sheet(`<div class="b" style="font-size:17px;margin-bottom:6px">Bienvenue dans l'app !</div><div class="sm dim" style="margin-bottom:14px">Tu as déjà joué dans le navigateur ? Récupère ta progression en 1 touche.</div>
@@ -1106,7 +1109,7 @@ fitApp();addEventListener("resize",fitApp);addEventListener("orientationchange",
 if(/[?&]r=/.test(location.search))history.replaceState(null,"",location.pathname);
 load();save();render();
 setTimeout(()=>{remSync();installBtn();if(location.search.includes("transfer=1")&&!NATIVE){history.replaceState(null,"",location.pathname);vSendAsk()}
-  else if(NATIVE&&!S.settings.transferAsked&&isFresh())vTransferAsk()
+  else if(NATIVE&&!S.settings.transferAsked&&isFresh())setTimeout(()=>{if(isFresh()&&!S.settings.transferAsked)vTransferAsk()},2500)
   else if(!NATIVE&&isStandalone()&&isAndroid&&!S.settings.realAsked)vRealApp()
   else if((NATIVE||(isStandalone()&&"Notification" in window))&&!S.settings.remAsked)vRemAsk()},1500);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)remSync()});

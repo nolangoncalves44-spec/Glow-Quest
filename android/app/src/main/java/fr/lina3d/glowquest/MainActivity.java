@@ -1,7 +1,10 @@
 package fr.lina3d.glowquest;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -41,6 +44,25 @@ public class MainActivity extends Activity {
         String js = "window.gqImport&&gqImport(" + JSONObject.quote(pending) + ")";
         pending = null;
         web.evaluateJavascript(js, null);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (!hasFocus) return;
+        try {
+            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            if (cm == null || !cm.hasPrimaryClip()) return;
+            ClipData clip = cm.getPrimaryClip();
+            if (clip == null || clip.getItemCount() == 0) return;
+            CharSequence t = clip.getItemAt(0).getText();
+            if (t == null) return;
+            String s = t.toString().trim();
+            if (!s.startsWith("GLOWQUEST:")) return;
+            pending = s.substring(10);
+            if (Build.VERSION.SDK_INT >= 28) cm.clearPrimaryClip(); else cm.setPrimaryClip(ClipData.newPlainText("", ""));
+            inject();
+        } catch (Exception e) { }
     }
 
     @Override
