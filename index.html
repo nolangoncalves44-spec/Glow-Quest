@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="2.0.2";
+const APP_VERSION="2.0.3";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -687,6 +687,7 @@ const CATALOG_F=CATALOG,CATALOG_M={hair:[],outfit:[],acc:[],shoes:[]};
  for(const cat in CATALOG_M)CATALOG_M[cat].sort((a,b)=>a.price-b.price);
 })();
 const DEF_WEAR_M={hair:(CATALOG_M.hair.find(x=>x.d[1]==="short"&&x.r<2)||CATALOG_M.hair.find(x=>["crew","messy"].includes(x.d[1]))).id,outfit:(CATALOG_M.outfit.find(x=>x.o.top==="tee"&&["jeans","pants"].includes(x.o.bot)&&!x.o.back)||CATALOG_M.outfit.find(x=>x.o.top==="tee")).id,acc:"ma_none",shoes:"mf0",back:"b_none"};
+for(const cat in CATALOG_M)for(const it of CATALOG_M[cat])if(!it.price&&!/_none$/.test(it.id)){it.price=25;it.r=0}
 [DEF_WEAR_M.hair,DEF_WEAR_M.outfit,DEF_WEAR_M.shoes].forEach(id=>{ITEM[id].price=0;ITEM[id].r=0;delete ITEM[id].fx});
 {const h=ITEM[DEF_WEAR_M.hair];h.d=h.d.slice();h.d[1]="short";h.d[2]="irr";h.d[3]="short";h.d[4]=null;h.d[5]=0;h.d[6]="#4a3226";h.d[7]=null;h.name="Court brun";
  const o=ITEM[DEF_WEAR_M.outfit];o.o=Object.assign({},o.o,{top:"tee",bot:"jeans",c:"#f4f4fa",k:"#4a6fa5",k2:null,pat:null,pp:null,belt:null,back:null});o.name="T-shirt blanc et jean";
