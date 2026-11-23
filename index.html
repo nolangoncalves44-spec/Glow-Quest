@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="1.5.1";
+const APP_VERSION="1.5.2";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -892,6 +892,26 @@ function vRemAsk(){S.settings.remAsked=true;save();
  <div id="remP">${remPicker(S.settings.remN)}</div>
  <button class="btn m" style="width:100%;margin-top:14px" data-act="remon">Activer</button><button class="btn alt" style="width:100%;margin-top:10px" data-act="close">Plus tard</button>`)}
 
+
+/* ===================== INSTALLATION ===================== */
+let installEvt=null;
+const isStandalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+function installBtn(){
+ let b=document.getElementById("instBtn");
+ if(isStandalone()){if(b)b.remove();return}
+ if(!b){b=document.createElement("button");b.id="instBtn";b.className="btn g";b.textContent="Installer l'app";
+  b.style.cssText="position:fixed;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:100;box-shadow:0 4px 0 var(--goldd),0 6px 20px rgba(0,0,0,.5);animation:pop .4s cubic-bezier(.2,1.6,.4,1)";
+  b.onclick=doInstall;document.body.appendChild(b)}
+}
+async function doInstall(){
+ if(installEvt){installEvt.prompt();const r=await installEvt.userChoice;installEvt=null;if(r.outcome==="accepted"){const b=document.getElementById("instBtn");if(b)b.remove()}return}
+ sheet(isIOS?`<div class="b" style="font-size:17px;margin-bottom:10px">Installer sur iPhone</div><div style="line-height:1.6">1. Ouvre ce lien dans <b>Safari</b><br>2. Touche le bouton <b>Partager</b> (carré avec une flèche)<br>3. Choisis <b>Sur l'écran d'accueil</b>, puis <b>Ajouter</b></div><button class="btn v" style="width:100%;margin-top:16px" data-act="close">OK</button>`
+  :`<div class="b" style="font-size:17px;margin-bottom:10px">Installer l'app</div><div style="line-height:1.6">1. Touche le menu <b>trois points</b> en haut à droite de Chrome<br>2. Choisis <b>Installer l'application</b> ou <b>Ajouter à l'écran d'accueil</b><br>3. Confirme avec <b>Installer</b></div><button class="btn v" style="width:100%;margin-top:16px" data-act="close">OK</button>`);
+}
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;installBtn()});
+addEventListener("appinstalled",()=>{installEvt=null;const b=document.getElementById("instBtn");if(b)b.remove();toast("App installée !")});
+
 /* ===================== FEUILLES ===================== */
 function sheet(html){document.getElementById("sheetIn").innerHTML=html;document.getElementById("sheet").classList.add("on")}
 function closeSheet(){stopBreath();document.getElementById("sheet").classList.remove("on");document.getElementById("sheetIn").innerHTML=""}
@@ -1048,7 +1068,7 @@ function fitApp(){const h=(window.visualViewport?visualViewport.height:innerHeig
 fitApp();addEventListener("resize",fitApp);addEventListener("orientationchange",()=>setTimeout(fitApp,300));addEventListener("pageshow",fitApp);if(window.visualViewport)visualViewport.addEventListener("resize",fitApp);setTimeout(fitApp,500);setTimeout(fitApp,1500);
 if(location.search.includes("r="))history.replaceState(null,"",location.pathname);
 load();save();render();
-setTimeout(()=>{remSync();if(!S.settings.remAsked&&"Notification" in window)vRemAsk()},1500);
+setTimeout(()=>{remSync();installBtn();if(isStandalone()&&!S.settings.remAsked&&"Notification" in window)vRemAsk()},1500);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)remSync()});
 </script>
 </body>
