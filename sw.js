@@ -1,6 +1,6 @@
 // Glow Quest - service worker
 // A CHAQUE MISE A JOUR : changer VERSION (et APP_VERSION dans index.html)
-const VERSION = "1.9.1";
+const VERSION = "2.0.0";
 const CACHE = "glowquest-" + VERSION;
 const FILES = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
