@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="2.0.3";
+const APP_VERSION="2.0.4";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -986,7 +986,7 @@ function vJournal(){
   <div class="moods">${Array.from({length:10},(_,i)=>i+1).map(m=>`<button data-act="mood" data-v="${m}" class="${r.mood===m?"on":""}" style="${r.mood===m?`background:${col(m)};box-shadow:0 0 10px ${col(m)}`:`color:${col(m)}`}">${m}</button>`).join("")}</div></div>
  <div class="card" style="flex:none;display:flex;flex-direction:column;gap:8px"><span class="ttl">Journal (3 lignes)</span>
   ${[0,1,2].map(i=>`<input type="text" data-j="${i}" value="${esc(r.j[i])}" placeholder="${["Ce qui s'est bien passé","Ce qui a été dur","Ce que je retiens"][i]}">`).join("")}
-  <button class="btn" data-act="jsave">Valider le journal</button></div>
+  <button class="btn${r.jd?" m":""}" data-act="jsave">${r.jd?"Journal validé (modifier)":"Valider le journal"}</button></div>
  <button class="btn m" data-act="breath" style="flex:none">Respiration guidée 4 s / 6 s</button>
  ${moodLow()?`<div class="card sm" style="flex:none;border-left:4px solid var(--pink)">Ton humeur est basse depuis quelques jours. Vas-y doucement. Si ça pèse, parles-en à un proche ou à un professionnel.</div>`:""}`;
 }
@@ -1264,7 +1264,7 @@ document.addEventListener("click",ev=>{
   case"wq":{const q=weekQuest(C.curWk),was=!!q.w.doneDate;act(()=>{q.w.n=Math.max(0,Math.min(q.target,q.w.n+(+v)));if(q.w.n>=q.target&&!q.w.doneDate)q.w.doneDate=T;else if(q.w.n<q.target)q.w.doneDate=null},ev,+v>0?"part":"un");
    if(!was&&q.w.doneDate){SFX.perfect();overlay("QUÊTE ACCOMPLIE",`+${COIN_WQ} pièces . +${WQ_XP} XP`,W())}break}
   case"mood":act(()=>{dayRec(T).mood=+v;autoJournal()},ev,+v>=6?"ok":"part");break;
-  case"jsave":{const r=dayRec(T);if(!r.mood||r.j.some(l=>!l.trim())){SFX.err();floatAt("Humeur + 3 lignes",ev.clientX-50,ev.clientY,"#ff7eb6");break}act(autoJournal,ev,"ok");break}
+  case"jsave":{const r=dayRec(T);if(!r.mood||r.j.some(l=>!l.trim())){SFX.err();floatAt("Humeur + 3 lignes",ev.clientX-50,ev.clientY,"#ff7eb6");break}act(()=>{r.jd=1;autoJournal()},ev,"ok");floatAt(r.m.journal?"Journal validé":"Journal enregistré",ev.clientX-60,ev.clientY-20,"#6ee7c8");break}
   case"scat":shopCat=v;shopPage=0;shopSel=null;SFX.page();render();break;
   case"pick":shopSel=v;fx={anim:"spin",sound:"page"};render();break;
   case"page":{const n=Math.ceil(CAT()[shopCat].length/15);shopPage=Math.max(0,Math.min(n-1,shopPage+(+v)));SFX.page();render();break}
