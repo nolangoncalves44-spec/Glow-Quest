@@ -9,8 +9,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      HAS_KEY: ${{ secrets.ANDROID_KEYSTORE_B64 != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -20,23 +18,15 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.7"
-      - name: Test de compilation (sans clé)
-        if: env.HAS_KEY != 'true'
-        run: gradle -p android assembleDebug --no-daemon && echo "Compilation OK. Ajoute les secrets ANDROID_KEYSTORE_B64 et ANDROID_KEYSTORE_PASS pour publier l'APK."
-      - name: Clé de signature
-        if: env.HAS_KEY == 'true'
-        run: echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > android/app/release.jks
       - name: Compilation
-        if: env.HAS_KEY == 'true'
         env:
-          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
           VERSION_CODE: ${{ github.run_number }}
           VERSION_NAME: "1.${{ github.run_number }}"
-        run: gradle -p android assembleRelease --no-daemon
-      - if: env.HAS_KEY == 'true'
-        run: cp android/app/build/outputs/apk/release/app-release.apk GlowQuest.apk
-      - if: env.HAS_KEY == 'true'
-        uses: softprops/action-gh-release@v2
+        run: |
+          export KS_PASS="$(cat android/keystore.pass)"
+          gradle -p android assembleRelease --no-daemon
+      - run: cp android/app/build/outputs/apk/release/app-release.apk GlowQuest.apk
+      - uses: softprops/action-gh-release@v2
         with:
           tag_name: android
           name: Glow Quest Android
