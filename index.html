@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="1.9.0";
+const APP_VERSION="1.9.1";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -257,6 +257,7 @@ function hairSVG(it,X,layer){
  if(layer==="back"){
   const B=HB[back];if(B[2])s+=pa("M70,96 L132,96 L136,"+(B[1][0]+30)+" L68,"+(B[1][0]+30)+" Z",shade(col,-.6));
   if(tie&&TIES[tie].back)s+=TIES[tie].back(c,F);
+  if(back==="curlyS"){for(let a=0;a<14;a++){const t=Math.PI*(.95+a*.08),x=100+Math.cos(t)*46,y=62+Math.sin(t)*42;s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="${F}" stroke="${c.s}" stroke-width=".7"/>`}}
   if(back==="curly"){for(let y=70;y<=196;y+=17)s+=`<circle cx="52" cy="${y}" r="12" fill="${F}" stroke="${c.s}" stroke-width=".7"/><circle cx="148" cy="${y}" r="12" fill="${F}" stroke="${c.s}" stroke-width=".7"/>`}
   s+=pa(B[0],F,c.s);
   if(!X.lite){for(let i=0;i<46;i++){const x0=48+R()*104,y0=40+R()*60,y1=B[1][0]+R()*(B[1][1]-B[1][0]),x1=x0+(x0-100)*(.08+R()*.12);s+=ln(`M${x0.toFixed(1)},${y0.toFixed(1)} Q${(x0+(x0-100)*.12).toFixed(1)},${((y0+y1)/2).toFixed(1)} ${x1.toFixed(1)},${y1.toFixed(1)}`,R()<.7?c.s:c.l,.3+R()*.25,.25+R()*.2)}
@@ -571,21 +572,24 @@ Object.assign(HB,{
  crew:["M60,58 C54,24 146,24 140,58 C142,70 140,80 138,88 L62,88 C60,80 58,70 60,58 Z",[78,88],0],
  messy:["M58,60 L50,48 L60,44 L54,30 L68,32 L68,18 L82,24 L88,8 L100,20 L112,8 L118,24 L132,18 L132,32 L146,30 L140,44 L150,48 L142,60 C144,74 142,88 138,98 L62,98 C58,88 56,74 58,60 Z",[86,98],0],
  spiky:["M58,62 L44,42 L60,40 L52,16 L72,28 L74,2 L90,20 L100,-6 L110,20 L126,2 L128,28 L148,16 L140,40 L156,42 L142,62 C144,76 142,88 138,98 L62,98 C58,88 56,76 58,62 Z",[86,98],0],
- wolf:["M58,56 C50,18 150,18 142,56 C148,80 150,104 146,124 L138,116 L134,132 L126,120 L118,130 L82,130 L74,120 L66,132 L62,116 L54,124 C50,104 52,80 58,56 Z",[110,128],0],
- mullet:["M58,56 C50,18 150,18 142,56 C146,74 146,90 142,100 C146,120 144,140 136,154 L124,146 L112,152 L88,152 L76,146 L64,154 C56,140 54,120 58,100 C54,90 54,74 58,56 Z",[130,152],0]
+ wolf:["M58,56 C50,18 150,18 142,56 C147,76 148,96 144,112 L136,106 L132,118 L124,108 L116,116 L84,116 L76,108 L68,118 L64,106 L56,112 C52,96 53,76 58,56 Z",[98,116],0],
+ mullet:["M58,56 C50,18 150,18 142,56 C146,72 145,86 140,96 C142,108 140,118 134,126 L124,120 L112,124 L88,124 L76,120 L66,126 C60,118 58,108 60,96 C55,86 54,72 58,56 Z",[104,124],0],
+ undercut:["M60,58 C50,14 150,14 140,58 L138,64 C139,72 138,80 136,86 L64,86 C62,80 61,72 62,64 Z",[76,86],0],
+ curlyS:["M58,58 C52,22 148,22 142,58 C146,74 144,92 138,104 L62,104 C56,92 54,74 58,58 Z",[92,104],0],
+ sidecut:["M58,56 C50,18 150,18 142,56 C146,72 146,88 142,102 L120,102 L118,94 L62,94 C56,82 55,70 58,56 Z",[88,102],0]
 });
 Object.assign(BANG,{
  short:["M56,64 C50,28 76,10 100,10 C124,10 150,28 144,64 C138,54 128,50 118,52 L112,48 L104,54 L96,48 L88,54 L80,48 L72,54 C64,54 60,58 56,64 Z"],
  spiky:["M54,72 C48,30 76,10 100,10 C124,10 152,30 146,72 L136,52 L130,66 L122,48 L114,64 L106,46 L98,62 L90,46 L82,64 L74,50 L68,68 L62,54 Z"]
 });
 const MCOL=[["noir","#22202b"],["brun","#4a3226"],["châtain","#7a5236"],["blond","#d9b15a"],["roux","#b8492f"],["argent","#c2c4d2"],["bleu nuit","#2b3a73"],["blanc","#eceaf2"],["vert forêt","#3f6b4a"],["bordeaux","#6e2235"],["cendré","#8a8a96"],["violet","#5b3f99"],["cuivre","#a8653a"],["bleu glacier","#9fc4e6"],["corbeau","#141320"]];
-const BACKN={crew:"Coupe rase",short:"Court",messy:"En bataille",spiky:"Piquant",wolf:"Coupe loup",mullet:"Mulet",curly:"Bouclé",med:"Mi-long",bob:"Carré",long:"Long",wavy:"Ondulé"};
+const BACKN={undercut:"Undercut",curlyS:"Boucles courtes",sidecut:"Coupe asymétrique",crew:"Coupe rase",short:"Court",messy:"En bataille",spiky:"Piquant",wolf:"Coupe loup",mullet:"Mulet",curly:"Bouclé",med:"Mi-long",bob:"Carré",long:"Long",wavy:"Ondulé"};
 const BANGN={short:"frange courte",irr:"mèches libres",swL:"mèche à gauche",swR:"mèche à droite",spiky:"frange pointue",part:"raie au milieu"};
-const TIEN={ponyL:"et queue basse",bun:"et chignon",halfup:"demi-attaché"};
-const MHAIRS=(()=>{const backs=["crew","short","messy","spiky","wolf","mullet","curly","med","bob","long","wavy"],bangs=["short","irr","swL","swR","spiky","part"],R=rng(hash("mhair"));const combos=[];
+const TIEN={ponyL:"et queue basse",bun:"et chignon samouraï",halfup:"demi-attaché"};
+const MHAIRS=(()=>{const backs=["crew","short","messy","spiky","wolf","mullet","undercut","curlyS","sidecut"],bangs=["short","irr","swL","swR","spiky","part"],R=rng(hash("mhair"));const combos=[];
  backs.forEach(b=>bangs.forEach(g=>combos.push([b,g])));combos.sort(()=>R()-.5);const out=[];
- for(let i=0;i<45;i++){const[b,g]=combos[i];const side=["crew","spiky","messy"].includes(b)?"none":(["long","med","wavy"].includes(b)?"long":"short");
-  const tie=(b==="med"&&i%3===0)?"ponyL":(b==="long"&&i%2===0)?"bun":(b==="wavy"&&i%2)?"halfup":null;const col=MCOL[(i*7)%MCOL.length],omb=i>=30?["#6ee7c8","#ff7eb6","#ffd166","#7cc4f5","#c4a6ff"][i%5]:null;
+ for(let i=0;i<45;i++){const[b,g]=combos[i];const side=["short","wolf","mullet","sidecut"].includes(b)?"short":"none";
+  const tie=(b==="undercut"&&i%2===0)?"bun":null;const col=MCOL[(i*7)%MCOL.length],omb=i>=30?["#6ee7c8","#ff7eb6","#ffd166","#7cc4f5","#c4a6ff"][i%5]:null;
   out.push([`${BACKN[b]}, ${BANGN[g]}${tie?" "+TIEN[tie]:""}`,b,g,side,tie,i%9===4?1:0,col[1],omb])}return out})();
 /* tenues garçon : nouveaux hauts et bas */
 const MTOP_EXTRA={
@@ -630,6 +634,12 @@ const MACC_NEW={
  "Écouteurs":c=>`<circle cx="60" cy="86" r="3.4" fill="${c}" stroke="${od(c)}" stroke-width=".6"/><circle cx="140" cy="86" r="3.4" fill="${c}" stroke="${od(c)}" stroke-width=".6"/>`,
  "Badge étoile":c=>P(star(78,166,6),c),
  "Chapeau melon":c=>P("M62,40 C62,4 138,4 138,40 Z",c)+`<ellipse cx="100" cy="42" rx="52" ry="7" fill="${c}" stroke="${od(c)}" stroke-width=".7"/>`+P("M64,32 L136,32 L137,38 L63,38 Z",shade(c,.3)),
+
+ "Haut-de-forme":c=>P("M70,40 L74,-14 L126,-14 L130,40 Z",c)+`<ellipse cx="100" cy="40" rx="46" ry="7" fill="${c}" stroke="${od(c)}" stroke-width=".7"/>`+P("M72,26 L128,26 L129,34 L71,34 Z","#d63a3a"),
+ "Chapeau de cowboy":c=>P("M66,40 C64,10 80,4 100,12 C120,4 136,10 134,40 Z",c)+P("M36,40 Q60,30 100,44 Q140,30 164,40 Q150,58 100,54 Q50,58 36,40 Z",shade(c,-.1))+ln("M68,34 Q100,40 132,34",shade(c,-.35),1.6,1),
+ "Plaque militaire":c=>ln("M86,124 Q100,146 112,124","#9a98a8",.8,1)+P("M96,144 L104,144 L104,156 L96,156 Z",c)+ln("M98,148 L102,148 M98,151 L102,151","#555",.4,1),
+ "Lunettes d'aviateur":c=>pa("M71,74 Q84,70 96,74 Q96,88 84,90 Q72,88 71,74 Z M104,74 Q116,70 129,74 Q128,88 116,90 Q104,88 104,74 Z","#6b4430",c,1.2,'fill-opacity=".75"')+ln("M96,75 L104,75",c,1.4,1),
+ "Casque gamer":c=>ln("M58,72 C54,4 146,4 142,72",od(c),8,1)+ln("M58,72 C54,4 146,4 142,72",c,5.5,1)+P("M48,62 C48,56 64,56 64,62 L64,92 C64,98 48,98 48,92 Z",c)+P(mir("M48,62 C48,56 64,56 64,62 L64,92 C64,98 48,98 48,92 Z"),c)+ln("M56,92 Q64,108 86,104",c,2,1)+`<circle cx="87" cy="104" r="2.4" fill="#2b2734"/>`+ln("M53,68 L53,86",'#6ee7c8',2,1),
  "Couronne de lauriers":c=>ln("M58,48 C64,22 136,22 142,48",'#3f6b4a',1.6,1)+Array.from({length:12},(_,i)=>{const x=60+i*7,y=26+Math.pow((x-100)/40,2)*20;return`<ellipse cx="${x}" cy="${y.toFixed(1)}" rx="4" ry="2" fill="${c}" transform="rotate(${x<100?-30:30} ${x} ${y.toFixed(1)})"/>`}).join("")
 };
 const MACC_LIST=[
@@ -638,9 +648,9 @@ const MACC_LIST=[
  ["Écouteurs","Écouteurs","#f4f4fa"],["Écharpe","Écharpe","#2f3e7a"],["Chaîne dorée","Chaîne dorée","#ffd166"],["Collier dent de requin","Collier dent de requin","#f4f4fa"],["Pansement","Pansement","#ffe2c8"],
  ["Boucle croix","Boucle croix","#c9c9d6"],["Boucles étoiles","Boucles étoiles","#c9c9d6"],["Badge étoile","Badge étoile","#ffd166"],["Béret","Béret","#2b2734"],["Chapeau de paille","Chapeau de paille","#e8c77c"],
  ["Chapeau melon","Chapeau melon","#2b2734"],["Visière","Visière","#6ee7c8"],["Bandeau ninja","Bandeau ninja","#2f3e7a"],["Cache-œil","Cache-œil","#1b1820"],["Petites cornes","Petites cornes","#7d2638"],
- ["Oreilles de chat","Oreilles de chat","#22202b"],["Masque de renard","Masque de renard","#f4f4fa"],["Pendentif lune","Pendentif lune","#c9c9d6"],["Couronne de lauriers","Couronne de lauriers","#8fae8b"],
- ["Oreilles de renard","Oreilles de renard","#b8492f"],["Lunettes étoiles","Lunettes étoiles","#7cc4f5"],["Plume dorée","Plume dorée","#ffd166"],["Pince lune","Pince lune","#9fc4e6"],["Couronne dorée","Couronne dorée","#ffd166"],
- ["Tiare","Tiare","#9fc4e6"],["Auréole","Auréole","#ffe066"],["Corne de licorne","Corne de licorne","#c4a6ff"],["Bandeau de perles","Bandeau de perles","#e8e8f2"],["Pendentif cœur","Pendentif cœur","#d63a3a"],
+ ["Oreilles de chat","Oreilles de chat","#22202b"],["Masque de renard","Masque de renard","#f4f4fa"],["Pendentif lune","Pendentif lune","#9a98a8"],["Couronne de lauriers","Couronne de lauriers","#8fae8b"],
+ ["Oreilles de renard","Oreilles de renard","#b8492f"],["Lunettes étoiles","Lunettes étoiles","#7cc4f5"],["Bandana noir","Bandana","#22202b"],["Lunettes d'aviateur","Lunettes d'aviateur","#d9a441"],["Couronne dorée","Couronne dorée","#ffd166"],
+ ["Haut-de-forme","Haut-de-forme","#22202b"],["Auréole","Auréole","#ffe066"],["Casque gamer","Casque gamer","#2b2734"],["Chapeau de cowboy","Chapeau de cowboy","#a8653a"],["Plaque militaire","Plaque militaire","#c2c4d2"],
  ["Ailes de tête","Ailes de tête","#2b2734"],["Couronne de cristal","Couronne de cristal","#bfe8ff"],["Halo d'étoiles","Halo d'étoiles","#ffe066"],["Oreilles de chat cosmiques","Oreilles de chat cosmiques","#2b2134"],["Familier lune","Familier lune","#ffe066"]
 ];
 const MSHOE_NEW={
@@ -658,18 +668,18 @@ const MSHOE_LIST=[
  ["Derbies","Derbies","#6b4430"],["Mocassins et chaussettes","Mocassins et chaussettes","#2b2734"],["Bottines lacées","Bottines lacées","#7a5236"],["Bottes de pluie","Bottes de pluie","#3f6b4a"],["Sandales d'été","Sandales d'été","#6b4430"],
  ["Geta","Geta","#a8653a"],["Rangers","Rangers","#22202b"],["Bottes de motard","Bottes de motard","#2b2734"],["Chaussons","Chaussons","#8a8a96"],["Tongs","Tongs","#2f3e7a"],
  ["Après-ski","Après-ski","#4a3226"],["Patins à roulettes","Patins à roulettes","#d63a3a"],["Baskets pastel","Baskets pastel","#9fc4e6"],["Baskets néon","Baskets néon","#ffe066"],["Chaussettes rayées","Chaussettes rayées","#2f3e7a"],
- ["Chaussettes hautes noires","Chaussettes hautes noires","#f4f4fa"],["Bottes cavalières","Bottes cavalières","#22202b"],["Sabots","Sabots fleuris","#6b4430"],["Bottes en cuir","Bottes en cuir blanc","#4a3226"],["Bottes hautes","Bottes hautes","#6e2235"],
+ ["Chaussettes hautes noires","Chaussettes hautes noires","#f4f4fa"],["Bottes cavalières","Bottes cavalières","#22202b"],["Sabots","Geta","#6b4430"],["Bottes en cuir","Bottes en cuir blanc","#4a3226"],["Bottes hautes","Bottes hautes","#6e2235"],
  ["Baskets montantes rouges","Baskets montantes","#d63a3a"],["Running néon","Running","#6ee7c8"],["Derbies vernies","Derbies","#1b1820"],["Bottines à fourrure","Bottines à fourrure","#7a5236"],["Skate rayées","Chaussures de skate","#2b2734"],
  ["Bottes à lacets dorés","Bottes à lacets dorés","#22202b"],["Rangers cloutés","Rangers cloutés","#3a3748"],["Baskets holographiques","Baskets holographiques","#c2c4d2"],["Bottes de pluie étoile","Bottes de pluie","#2b3a73"],["Mocassins et chaussettes nuage","Mocassins et chaussettes nuage","#4a3226"],
- ["Motard argent","Bottes de motard","#c2c4d2"],["Geta laquées","Geta","#6e2235"],["Bottes fourrure glacier","Bottes fourrure lilas","#9fc4e6"],["Running holographique","Running","#c4a6ff"],["Derbies dorées","Derbies","#d9a441"],
- ["Baskets ailées","Baskets ailées","#f4f4fa"],["Bottes galaxie","Bottes galaxie","#141320"],["Patins arc-en-ciel","Patins arc-en-ciel","#ffffff"],["Bottes de fée","Bottes de fée","#3f6b4a"],["Pantoufles de verre","Pantoufles de verre","#dff3ff"]
+ ["Motard argent","Bottes de motard","#c2c4d2"],["Geta laquées","Geta","#6e2235"],["Bottes fourrure glacier","Après-ski","#9fc4e6"],["Running holographique","Running","#c4a6ff"],["Derbies dorées","Derbies","#d9a441"],
+ ["Baskets ailées","Baskets ailées","#f4f4fa"],["Bottes galaxie","Bottes galaxie","#141320"],["Patins de feu","Patins à roulettes","#ff6b3d"],["Bottes de dragon","Bottes galaxie","#6e2235"],["Rangers de légende","Rangers cloutés","#ffd166"]
 ];
 const CATALOG_F=CATALOG,CATALOG_M={hair:[],outfit:[],acc:[],shoes:[]};
 (function buildM(){
  const cp=(it,fid)=>{const f=ITEM[fid];it.r=f.r;it.price=f.price;it.g="m";ITEM[it.id]=it;return it};
  MHAIRS.forEach((d,i)=>CATALOG_M.hair.push(cp({cat:"hair",id:"mh"+i,d,name:d[0],k:"#2b2734"},"h"+i)));
  MOUTFITS.forEach((o,i)=>{const e=o[7]||{};CATALOG_M.outfit.push(cp({cat:"outfit",id:"mo"+i,name:o[0],o:{top:o[1],bot:o[2],c:C_(o[3]),k:C_(o[4]),pat:o[5],pp:o[6],belt:e.belt,back:e.back}},"o"+i))});
- MACC_LIST.forEach((a,i)=>{const f=MACC_NEW[a[1]]||accFn(a[1]);CATALOG_M.acc.push(cp({cat:"acc",id:"ma"+i,name:a[0],c:a[2],f,neck:["Chaîne dorée","Collier dent de requin","Badge étoile"].includes(a[1])||accNeck(a[1])},"a"+i))});
+ MACC_LIST.forEach((a,i)=>{const f=MACC_NEW[a[1]]||accFn(a[1]);CATALOG_M.acc.push(cp({cat:"acc",id:"ma"+i,name:a[0],c:a[2],f,neck:["Chaîne dorée","Collier dent de requin","Badge étoile","Plaque militaire"].includes(a[1])||accNeck(a[1])},"a"+i))});
  MSHOE_LIST.forEach((s,i)=>{const f=MSHOE_NEW[s[1]]||shoeFn(s[1])||(c=>P(FL,c)+P(FR,c));CATALOG_M.shoes.push(cp({cat:"shoes",id:"mf"+i,name:s[0],f,c:s[2]},"f"+i))});
  const LP=["sparkle","embers","snow","bubbles","stars","notes","confetti","rainbow","beam","galaxy","feathers","petals"],AU=["#7cc4f5","#ffcf5a","#6ee7c8","#c4a6ff","#ff9f55","#ffffff"];const cmb=[];for(let a=0;a<LP.length;a++)for(let b=a+1;b<LP.length;b++)cmb.push([LP[a],LP[b]]);{const Rc=rng(hash("mcombos"));cmb.sort(()=>Rc()-.5)}let li=0;
  for(const cat in CATALOG_M)for(const it of CATALOG_M[cat]){if(it.r===3){it.fx=["aura",...cmb[li%cmb.length]];it.fxc=AU[li%AU.length];li++}else if(it.r===2){const pool=["sparkle","bubbles","glow","embers","snow"];it.fx=[pool[hash(it.id)%pool.length]];it.fxc=it.c&&it.cat!=="hair"?it.c:"#7cc4f5"}}
