@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="1.4.1";
+const APP_VERSION="1.4.2";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -1000,7 +1000,7 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden){lastDay=t
 setInterval(()=>{if(today()!==lastDay){lastDay=today();render()}},60000);
 /* ===================== MISE A JOUR (service worker) ===================== */
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")){
- navigator.serviceWorker.register("sw.js").then(reg=>{
+ navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(reg=>{
   const ask=w=>{const b=document.createElement("div");b.className="upd";b.innerHTML="Nouvelle version disponible <b>Mettre à jour</b>";
    b.onclick=()=>{try{const blob=new Blob([JSON.stringify(S)],{type:"application/json"});localStorage.setItem(KEY+"_backup",JSON.stringify(S))}catch(e){}w.postMessage("skip")};document.body.appendChild(b)};
   if(reg.waiting&&navigator.serviceWorker.controller)ask(reg.waiting);
