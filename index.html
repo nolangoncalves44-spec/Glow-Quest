@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="1.4.0";
+const APP_VERSION="1.4.1";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -606,11 +606,11 @@ function charSVG(w,h,vb,lite){
 const CROP={hair:[40,-16,120,140],acc:[36,-34,128,176],outfit:[34,112,132,290],shoes:[64,334,72,72]};
 
 /* ===================== SONS (Web Audio, sans fichier) ===================== */
-let AC=null;
+let AC=null;const VOL=2;
 function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==="suspended")AC.resume();return AC}
 function tone(f,t0,d,type,v,f2){if(!S||!S.settings.sound)return;const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+t0;
  o.type=type||"square";o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
- g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v||.06,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.03)}
+ g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(Math.min(.5,(v||.06)*VOL),t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.03)}
 const SFX={
  tap:()=>tone(1100,0,.035,"square",.025),
  ok:()=>{tone(880,0,.08,"triangle",.14);tone(1320,.06,.2,"triangle",.13);tone(2640,.06,.12,"sine",.03)},
@@ -834,7 +834,7 @@ function openReel(cards,win,onDone){
  const target=win*(CW+GAP)+CW/2-W/2+(Math.random()*0.7-0.35)*CW;
  strip.style.transform="translateX(0px)";
  requestAnimationFrame(()=>{strip.style.transition="transform 6s cubic-bezier(.1,.62,.1,1)";strip.style.transform=`translateX(${-target}px)`});
- let last=-1,run=true;const tick=()=>{if(!run)return;const m=new DOMMatrixReadOnly(getComputedStyle(strip).transform),pos=-m.m41+W/2,idx=Math.floor(pos/(CW+GAP));if(idx!==last){last=idx;SFX.page()}requestAnimationFrame(tick)};requestAnimationFrame(tick);
+ let last=-1,run=true;const tick=()=>{if(!run)return;const m=new DOMMatrixReadOnly(getComputedStyle(strip).transform),pos=-m.m41+W/2,idx=Math.floor(pos/(CW+GAP));if(idx!==last){last=idx;tone(1700,0,.035,"square",.04);tone(900,0,.02,"triangle",.05)}requestAnimationFrame(tick)};requestAnimationFrame(tick);
  setTimeout(()=>{run=false;const card=strip.children[win];card.style.boxShadow=`0 0 0 3px ${cards[win].color},0 0 22px ${cards[win].color}`;SFX.ok();setTimeout(onDone,900)},6200);
 }
 const itemCard=it=>({color:RARITY[it.r][1],html:`<div style="height:84px;display:flex;align-items:center">${charSVG(Object.assign({},S.wear,{[it.cat]:it.id}),0,CROP[it.cat],true).replace('<svg ','<svg style="height:84px;width:auto" ')}</div><div style="font-size:9px;font-weight:800;text-align:center;padding:0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92px">${esc(it.name)}</div>`});
