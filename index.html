@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="1.5.2";
+const APP_VERSION="1.6.0";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -869,6 +869,7 @@ const REM_MSG=["Tes missions du jour t'attendent !","Une petite quête avant de 
 let remTimers=[];
 function remSync(){
  remTimers.forEach(clearTimeout);remTimers=[];
+ if(NATIVE){try{Android.setReminders(!!S.settings.rem,(REM_TIMES[S.settings.remN]||[]).join(","));if(C&&C.today&&C.today.success)Android.setDone(today())}catch(e){}return}
  const on=S.settings.rem&&"Notification" in window&&Notification.permission==="granted";
  const cfg={on,times:REM_TIMES[S.settings.remN]||[],done:!!(C&&C.today&&C.today.success)};
  if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.controller.postMessage({type:"rem",cfg});
@@ -880,6 +881,7 @@ function remSync(){
  navigator.serviceWorker&&navigator.serviceWorker.ready.then(async r=>{try{if("periodicSync" in r){const st=await navigator.permissions.query({name:"periodic-background-sync"});if(st.state==="granted")await r.periodicSync.register("gq-rem",{minInterval:2*3600*1000})}}catch(e){}});
 }
 async function remEnable(n){
+ if(NATIVE){S.settings.rem=true;if(n)S.settings.remN=n;S.settings.remAsked=true;save();remSync();return true}
  if(!("Notification" in window)){toast("Notifications non disponibles ici");return false}
  const p=await Notification.requestPermission();
  if(p!=="granted"){toast("Autorisation refusée");S.settings.rem=false;save();return false}
@@ -895,16 +897,23 @@ function vRemAsk(){S.settings.remAsked=true;save();
 
 /* ===================== INSTALLATION ===================== */
 let installEvt=null;
+const NATIVE=!!window.Android;
+const APK_URL="https://github.com/nolangoncalves44-spec/Glow-Quest/releases/latest/download/GlowQuest.apk";
 const isStandalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
 const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
 function installBtn(){
  let b=document.getElementById("instBtn");
- if(isStandalone()){if(b)b.remove();return}
+ if(isStandalone()||NATIVE){if(b)b.remove();return}
  if(!b){b=document.createElement("button");b.id="instBtn";b.className="btn g";b.textContent="Installer l'app";
   b.style.cssText="position:fixed;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:100;box-shadow:0 4px 0 var(--goldd),0 6px 20px rgba(0,0,0,.5);animation:pop .4s cubic-bezier(.2,1.6,.4,1)";
   b.onclick=doInstall;document.body.appendChild(b)}
 }
 async function doInstall(){
+ if(!isIOS){sheet(`<div class="b" style="font-size:17px;margin-bottom:10px">Installer Glow Quest</div>
+  <a class="btn g" style="display:block;text-align:center;text-decoration:none;margin-bottom:10px" href="${APK_URL}">Télécharger l'app Android</a>
+  <div class="sm dim" style="line-height:1.5;margin-bottom:14px">Ouvre le fichier GlowQuest.apk téléchargé. Si Android le demande, autorise l'installation depuis Chrome (une seule fois), puis Installer.</div>
+  ${installEvt?`<button class="btn alt" style="width:100%" data-act="pwainst">Ou version web légère</button>`:""}
+  <button class="btn v" style="width:100%;margin-top:10px" data-act="close">Fermer</button>`);return}
  if(installEvt){installEvt.prompt();const r=await installEvt.userChoice;installEvt=null;if(r.outcome==="accepted"){const b=document.getElementById("instBtn");if(b)b.remove()}return}
  sheet(isIOS?`<div class="b" style="font-size:17px;margin-bottom:10px">Installer sur iPhone</div><div style="line-height:1.6">1. Ouvre ce lien dans <b>Safari</b><br>2. Touche le bouton <b>Partager</b> (carré avec une flèche)<br>3. Choisis <b>Sur l'écran d'accueil</b>, puis <b>Ajouter</b></div><button class="btn v" style="width:100%;margin-top:16px" data-act="close">OK</button>`
   :`<div class="b" style="font-size:17px;margin-bottom:10px">Installer l'app</div><div style="line-height:1.6">1. Touche le menu <b>trois points</b> en haut à droite de Chrome<br>2. Choisis <b>Installer l'application</b> ou <b>Ajouter à l'écran d'accueil</b><br>3. Confirme avec <b>Installer</b></div><button class="btn v" style="width:100%;margin-top:16px" data-act="close">OK</button>`);
@@ -940,7 +949,7 @@ function vSettings(){
  <div class="row sb" style="margin:6px 0 16px"><span class="sm dim">${S.cats.length} missions, ${M_PER_DAY} tirées par jour (${M_PTS} pts chacune)</span><button class="btn alt" data-act="catadd">Ajouter</button></div>
  <div class="ttl" style="margin-bottom:5px">Sauvegarde</div><div class="sm dim" style="margin-bottom:10px">Données stockées sur ce téléphone uniquement.</div>
  <div class="row" style="gap:7px"><button class="btn m" data-act="export">Exporter</button><button class="btn alt" data-act="import">Importer</button><button class="btn red" data-act="reset">Effacer</button></div>
- <div class="sm dim" style="margin-top:14px;text-align:center">Glow Quest v${APP_VERSION}</div>`);
+ ${NATIVE?"":`<a class="btn alt" style="display:block;text-align:center;text-decoration:none;margin-top:14px" href="${APK_URL}">Télécharger l'app Android</a>`}<div class="sm dim" style="margin-top:14px;text-align:center">Glow Quest v${APP_VERSION}${NATIVE?" (app Android)":""}</div>`);
 }
 let breathT=null;const stopBreath=()=>{if(breathT){clearTimeout(breathT);breathT=null}};
 function vBreath(){
@@ -978,7 +987,7 @@ function playFx(f){
 const SAY={ok:["Bien joué !","Validé !","Une de plus !","Trop forte !","Continue !"],part:["C'est déjà ça !","Mieux que rien !","On avance !"],un:["Oups, annulé","Pas grave"]};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 function act(fn,ev,kind){
- const before=C||compute();fn();save();const after=compute();
+ const before=C||compute();fn();save();const after=compute();if(NATIVE&&after.today.success&&!before.today.success)try{Android.setDone(today())}catch(e){}
  const f={coins:after.coins-before.coins,coinFrom:before.coins,xp:after.total-before.total,x:ev&&ev.clientX,y:ev&&ev.clientY};
  const K={ok:["jump","ok",8,15],part:["tilt","part",0,10],un:["sad","un",0,0],quest:["wave","quest",10,15],rest:["tilt","equip",0,0]}[kind];
  if(K){f.anim=K[0];f.sound=K[1];f.sparks=K[2];f.vib=K[3];f.say=kind==="quest"?"Quête accomplie !":kind==="rest"?"Repos bien mérité":SAY[kind]?pick(SAY[kind]):null}
@@ -1007,6 +1016,7 @@ document.addEventListener("click",ev=>{
   case"remn":S.settings.remN=+v;save();SFX.tap();{const e=document.getElementById("remP");if(e)e.innerHTML=remPicker(+v)}if(S.settings.rem)remSync();break;
   case"remon":remEnable(S.settings.remN).then(ok=>{closeSheet();render();if(ok)toast("Rappels activés")});break;
   case"remtoggle":if(S.settings.rem){S.settings.rem=false;save();remSync();vSettings()}else remEnable().then(()=>vSettings());break;
+  case"pwainst":if(installEvt){installEvt.prompt();installEvt=null}closeSheet();break;
   case"spin":doSpin();break;
   case"defi":{const r=dayRec(T);if(!r.defi)break;act(()=>{r.defi.done=!r.defi.done},ev,r.defi.done?"un":"quest");break}
   case"chest":{const k=+v,p=CHESTS[k][1];if(C.coins<p){SFX.err();toast("Pas assez de pièces");break}const it=grantRandom(k);if(!it){SFX.err();toast("Tout est déjà débloqué");break}S.spent+=p;save();render();
@@ -1032,7 +1042,7 @@ document.addEventListener("click",ev=>{
   case"compet":S.settings.compet=!S.settings.compet;save();SFX.tap();vSettings();break;
   case"catdel":if(S.cats.length>M_PER_DAY&&confirm("Supprimer cette mission ?")){S.cats.splice(+v,1);dayRec(T);save();vSettings()}break;
   case"catadd":S.cats.push({id:"c"+Date.now().toString(36),name:"Nouvelle mission"});dayRec(T);save();SFX.tap();vSettings();break;
-  case"export":{const b=new Blob([JSON.stringify(S)],{type:"application/json"}),u=URL.createObjectURL(b),l=document.createElement("a");l.href=u;l.download="glowquest-sauvegarde-"+T+".json";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);break}
+  case"export":{if(NATIVE){const ok=Android.saveFile("glowquest-sauvegarde-"+T+".json",JSON.stringify(S));toast(ok?"Enregistré dans Téléchargements":"Échec de l'export");break}const b=new Blob([JSON.stringify(S)],{type:"application/json"}),u=URL.createObjectURL(b),l=document.createElement("a");l.href=u;l.download="glowquest-sauvegarde-"+T+".json";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);break}
   case"import":document.getElementById("importFile").click();break;
   case"reset":if(confirm("Effacer toute la progression ?")&&confirm("Action définitive. Confirmer ?")){try{localStorage.removeItem(KEY)}catch(e){}S=null;load();save();closeSheet();render()}break;
  }
@@ -1068,7 +1078,7 @@ function fitApp(){const h=(window.visualViewport?visualViewport.height:innerHeig
 fitApp();addEventListener("resize",fitApp);addEventListener("orientationchange",()=>setTimeout(fitApp,300));addEventListener("pageshow",fitApp);if(window.visualViewport)visualViewport.addEventListener("resize",fitApp);setTimeout(fitApp,500);setTimeout(fitApp,1500);
 if(location.search.includes("r="))history.replaceState(null,"",location.pathname);
 load();save();render();
-setTimeout(()=>{remSync();installBtn();if(isStandalone()&&!S.settings.remAsked&&"Notification" in window)vRemAsk()},1500);
+setTimeout(()=>{remSync();installBtn();if((NATIVE||(isStandalone()&&"Notification" in window))&&!S.settings.remAsked)vRemAsk()},1500);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)remSync()});
 </script>
 </body>

@@ -1,0 +1,22 @@
+plugins { id 'com.android.application' }
+android {
+  namespace 'fr.lina3d.glowquest'
+  compileSdk 34
+  defaultConfig {
+    applicationId "fr.lina3d.glowquest"
+    minSdk 24
+    targetSdk 34
+    versionCode Integer.parseInt(System.getenv("VERSION_CODE") ?: "1")
+    versionName System.getenv("VERSION_NAME") ?: "1.0"
+  }
+  signingConfigs {
+    release {
+      storeFile file("release.jks")
+      storePassword System.getenv("KS_PASS")
+      keyAlias "glowquest"
+      keyPassword System.getenv("KS_PASS")
+    }
+  }
+  buildTypes { release { minifyEnabled false; signingConfig signingConfigs.release } }
+  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
