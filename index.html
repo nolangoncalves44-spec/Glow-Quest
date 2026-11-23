@@ -17,7 +17,7 @@
 html,body{height:100%;overflow:hidden;color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
 body{background:radial-gradient(ellipse at 50% -10%,#3b2380 0,transparent 55%),radial-gradient(circle at 90% 80%,#1d2a66 0,transparent 45%),var(--bg)}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;background-image:radial-gradient(1px 1px at 20% 30%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 70% 12%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 85% 55%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 35% 75%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 55% 45%,#ffcf5a 50%,transparent 51%),radial-gradient(1px 1px at 10% 90%,#fff 50%,transparent 51%)}
-#app{position:relative;height:100vh;height:100dvh;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);max-width:520px;margin:0 auto}
+#app{position:relative;height:100vh;height:100dvh;height:var(--apph,100dvh);display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);max-width:520px;margin:0 auto}
 header{flex:none;display:flex;align-items:center;gap:9px;padding:9px 14px 5px}
 main{flex:1;min-height:0;display:flex;flex-direction:column;gap:9px;padding:6px 14px 8px}
 nav{flex:none;display:flex;gap:4px;padding:6px 8px 7px;background:rgba(20,13,43,.92);border-top:1px solid var(--line)}
@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="1.5.0";
+const APP_VERSION="1.5.1";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -1042,8 +1042,11 @@ if("serviceWorker" in navigator&&location.protocol.startsWith("http")){
   reg.addEventListener("updatefound",()=>{const w=reg.installing;w.addEventListener("statechange",()=>{if(w.state==="installed"&&navigator.serviceWorker.controller)ask(w)})});
   setInterval(()=>reg.update(),3600000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)reg.update()});
  });
- let reloaded=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!reloaded){reloaded=true;location.reload()}});
+ let reloaded=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!reloaded){reloaded=true;location.replace(location.pathname.replace(/index\.html$/,"")+"?r="+Date.now())}});
 }
+function fitApp(){const h=(window.visualViewport?visualViewport.height:innerHeight);document.documentElement.style.setProperty("--apph",Math.round(h)+"px")}
+fitApp();addEventListener("resize",fitApp);addEventListener("orientationchange",()=>setTimeout(fitApp,300));addEventListener("pageshow",fitApp);if(window.visualViewport)visualViewport.addEventListener("resize",fitApp);setTimeout(fitApp,500);setTimeout(fitApp,1500);
+if(location.search.includes("r="))history.replaceState(null,"",location.pathname);
 load();save();render();
 setTimeout(()=>{remSync();if(!S.settings.remAsked&&"Notification" in window)vRemAsk()},1500);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)remSync()});
