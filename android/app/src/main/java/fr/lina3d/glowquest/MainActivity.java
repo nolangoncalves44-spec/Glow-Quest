@@ -16,14 +16,35 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 public class MainActivity extends Activity {
     static final String URL = "https://nolangoncalves44-spec.github.io/Glow-Quest/?app=1";
+    static final String SITE = "https://nolangoncalves44-spec.github.io/Glow-Quest/";
     WebView web;
     ValueCallback<Uri[]> fileCb;
+    String pending;
+    boolean loaded;
+
+    void handleIntent(Intent i) {
+        if (i == null) return;
+        String d = i.getStringExtra("data");
+        if (d == null && i.getData() != null && "glowquest".equals(i.getData().getScheme())) d = i.getData().getQueryParameter("d");
+        if (d != null) { pending = d; inject(); }
+    }
+
+    void inject() {
+        if (pending == null || !loaded || web == null) return;
+        String js = "window.gqImport&&gqImport(" + JSONObject.quote(pending) + ")";
+        pending = null;
+        web.evaluateJavascript(js, null);
+    }
+
+    @Override
+    protected void onNewIntent(Intent i) { super.onNewIntent(i); setIntent(i); handleIntent(i); }
 
     @Override
     protected void onCreate(Bundle state) {
@@ -50,6 +71,9 @@ public class MainActivity extends Activity {
                 try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception e) { }
                 return true;
             }
+
+            @Override
+            public void onPageFinished(WebView v, String url) { loaded = true; inject(); }
         });
         web.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -61,6 +85,7 @@ public class MainActivity extends Activity {
             }
         });
         if (state != null) web.restoreState(state); else web.loadUrl(URL);
+        handleIntent(getIntent());
         Reminders.reschedule(this);
     }
 
@@ -118,5 +143,10 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public String platform() { return "android"; }
+
+        @JavascriptInterface
+        public void openTransfer() {
+            try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(SITE + "?transfer=1"))); } catch (Exception e) { }
+        }
     }
 }
