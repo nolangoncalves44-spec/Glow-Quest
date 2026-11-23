@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="1.8.0";
+const APP_VERSION="1.9.0";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -308,6 +308,7 @@ function bottom(o,X,cb){
   case"pants":s=O(G.PANT_L,cb)+O(G.PANT_R,cb)+O(G.HIPS,cb)+ln("M88,240 L90,378 M112,240 L110,378",shade(cb,-.25),.6,.6);break;
   case"wide":s=O(G.WIDEP_L,cb)+O(G.WIDEP_R,cb)+O(G.HIPS,cb)+ln("M86,240 L86,380 M114,240 L114,380",shade(cb,-.25),.6,.6);break;
   case"legg":s=O(G.HIPS,cb)+O(G.LG_L,cb)+O(G.LG_R,cb)+ln("M80,240 L86,376",shade(cb,.4),1.4,.8)+ln("M120,240 L114,376",shade(cb,.4),1.4,.8);break;
+  default:if(MBOT_EXTRA[o.bot])s=MBOT_EXTRA[o.bot](o,X,O,cb);break;
   case"gown":s=O(skirtD(204,374,44),cb)+O(skirtD(204,330,32),shade(cb,.25))+O(skirtD(204,270,20),cb)+folds(204,374,44,cb,X,12)+Array.from({length:14},(_,i)=>`<circle cx="${58+i*6.5}" cy="${380+Math.sin(i)*1.2}" r="1.2" fill="#fff" opacity=".9"/>`).join("");break;
   case"bubble":s=O("M71,204 L129,204 C152,218 158,250 142,264 Q100,276 58,264 C42,250 48,218 71,204 Z",cb)+ln("M60,258 Q100,270 140,258",shade(cb,-.25),.8,.8)+ln("M80,214 Q76,236 72,256 M120,214 Q124,236 128,256",shade(cb,.35),1,.6);break;
   case"rainbow":s=["#ff8fa8","#ffd166","#6ee7c8","#7cc4f5","#c4a6ff"].map((cc,i)=>O(skirtD(204+i*14,262+i*22,14+i*6),cc)).reverse().join("");break;
@@ -331,6 +332,7 @@ function topSVG(o,X){
   case"jacket":s=P(G.TOP_L,WHITE)+O("M69,137 C79,130 90,131 96,131 L96,240 L67,240 C68,226 71,216 72,206 C70,190 64,172 64,152 Z",c)+O(mir("M69,137 C79,130 90,131 96,131 L96,240 L67,240 C68,226 71,216 72,206 C70,190 64,172 64,152 Z"),c)+P("M96,131 L84,160 L96,178 Z",shade(c,-.15))+P(mir("M96,131 L84,160 L96,178 Z"),shade(c,-.15))+sleevesLong(c,X)+`<circle cx="92" cy="200" r="2" fill="${k}"/><circle cx="92" cy="222" r="2" fill="${k}"/>`;break;
   case"cardigan":s=P(G.TOP_W,k)+nR(k)+O("M69,137 C79,130 88,131 92,132 L91,152 L89,232 L67,234 C66,210 64,180 64,152 Z",c)+O(mir("M69,137 C79,130 88,131 92,132 L91,152 L89,232 L67,234 C66,210 64,180 64,152 Z"),c)+ln("M67,226 L89,225 M111,225 L133,226",shade(c,-.2),.6,.8)+[166,184,202].map(y=>`<circle cx="87.5" cy="${y}" r="1.6" fill="#f4a0c4" stroke="#9c5a78" stroke-width=".4"/>`).join("")+sleevesLong(c,X)+(X.lite?"":[79,121].map(cx=>{let t="";for(let y=142;y<222;y+=9)t+=`<path d="M${cx-2},${y} Q${cx},${y+4.5} ${cx+2},${y+9} M${cx+2},${y} Q${cx},${y+4.5} ${cx-2},${y+9}" fill="none" stroke="${shade(c,-.2)}" stroke-width=".45" opacity=".8"/>`;return t}).join(""));break;
   case"bib":s=P(G.TOP_W,k)+P(G.SS_L,k)+P(G.SS_R,k)+nR(k)+P("M82,160 L118,160 L120,208 L80,208 Z",c)+P("M82,160 L77,134 L84,133 L88,160 Z",c)+P(mir("M82,160 L77,134 L84,133 L88,160 Z"),c)+`<circle cx="85" cy="164" r="2.4" fill="#ffd84d"/><circle cx="115" cy="164" r="2.4" fill="#ffd84d"/>`+P("M90,176 L110,176 L109,192 L91,192 Z",shade(c,-.1));break;
+  default:if(MTOP_EXTRA[o.top])s=MTOP_EXTRA[o.top](o,X,O);break;
   case"princess":s=O(G.TOP_W,c)+P(G.PUFF_L,WHITE)+P(G.PUFF_R,WHITE)+pa("M80,134 Q100,154 120,134 Z","url(#__s)",od(c))+ln("M80,134 Q100,154 120,134",WHITE,2,.9)+P("M96,160 L100,152 L104,160 L100,168 Z","#ff5fa2")+ln("M100,168 L100,206",shade(c,-.3),.6,.7);break;
   case"corset":s=O(G.TOP_W,c)+P(G.PUFF_L,WHITE)+P(G.PUFF_R,WHITE)+pa("M82,134 Q100,150 118,134 Z","url(#__s)",od(c))+(X.lite?"":[150,160,170,180,190].map(y=>ln(`M96,${y} L104,${y+6} M104,${y} L96,${y+6}`,k,.6,.9)).join(""))+ln("M100,148 L100,206",shade(c,-.3),.6,.7);break;
   case"vest":s=O(G.TOP_W,WHITE)+sleevesLong(WHITE,X)+nR(WHITE)+O("M70,138 L92,134 L100,170 L100,208 L72,208 C70,190 64,172 66,152 Z",c)+O(mir("M70,138 L92,134 L100,170 L100,208 L72,208 C70,190 64,172 66,152 Z"),c)+P("M98,140 L102,140 L104,170 L100,176 L96,170 Z",k);break;
@@ -564,14 +566,131 @@ const CATALOG={hair:[],outfit:[],acc:[],shoes:[]},ITEM={};
 const DEF_WEAR={hair:"h1",outfit:"o1",acc:"a_none",shoes:"f0"};
 [DEF_WEAR.hair,DEF_WEAR.outfit,DEF_WEAR.shoes].forEach(id=>{ITEM[id].price=0;ITEM[id].r=0});
 for(const cat in CATALOG)CATALOG[cat].sort((a,b)=>a.price-b.price);
+/* ===================== GARÇON : coiffures, tenues, accessoires, chaussures ===================== */
+Object.assign(HB,{
+ crew:["M60,58 C54,24 146,24 140,58 C142,70 140,80 138,88 L62,88 C60,80 58,70 60,58 Z",[78,88],0],
+ messy:["M58,60 L50,48 L60,44 L54,30 L68,32 L68,18 L82,24 L88,8 L100,20 L112,8 L118,24 L132,18 L132,32 L146,30 L140,44 L150,48 L142,60 C144,74 142,88 138,98 L62,98 C58,88 56,74 58,60 Z",[86,98],0],
+ spiky:["M58,62 L44,42 L60,40 L52,16 L72,28 L74,2 L90,20 L100,-6 L110,20 L126,2 L128,28 L148,16 L140,40 L156,42 L142,62 C144,76 142,88 138,98 L62,98 C58,88 56,76 58,62 Z",[86,98],0],
+ wolf:["M58,56 C50,18 150,18 142,56 C148,80 150,104 146,124 L138,116 L134,132 L126,120 L118,130 L82,130 L74,120 L66,132 L62,116 L54,124 C50,104 52,80 58,56 Z",[110,128],0],
+ mullet:["M58,56 C50,18 150,18 142,56 C146,74 146,90 142,100 C146,120 144,140 136,154 L124,146 L112,152 L88,152 L76,146 L64,154 C56,140 54,120 58,100 C54,90 54,74 58,56 Z",[130,152],0]
+});
+Object.assign(BANG,{
+ short:["M56,64 C50,28 76,10 100,10 C124,10 150,28 144,64 C138,54 128,50 118,52 L112,48 L104,54 L96,48 L88,54 L80,48 L72,54 C64,54 60,58 56,64 Z"],
+ spiky:["M54,72 C48,30 76,10 100,10 C124,10 152,30 146,72 L136,52 L130,66 L122,48 L114,64 L106,46 L98,62 L90,46 L82,64 L74,50 L68,68 L62,54 Z"]
+});
+const MCOL=[["noir","#22202b"],["brun","#4a3226"],["châtain","#7a5236"],["blond","#d9b15a"],["roux","#b8492f"],["argent","#c2c4d2"],["bleu nuit","#2b3a73"],["blanc","#eceaf2"],["vert forêt","#3f6b4a"],["bordeaux","#6e2235"],["cendré","#8a8a96"],["violet","#5b3f99"],["cuivre","#a8653a"],["bleu glacier","#9fc4e6"],["corbeau","#141320"]];
+const BACKN={crew:"Coupe rase",short:"Court",messy:"En bataille",spiky:"Piquant",wolf:"Coupe loup",mullet:"Mulet",curly:"Bouclé",med:"Mi-long",bob:"Carré",long:"Long",wavy:"Ondulé"};
+const BANGN={short:"frange courte",irr:"mèches libres",swL:"mèche à gauche",swR:"mèche à droite",spiky:"frange pointue",part:"raie au milieu"};
+const TIEN={ponyL:"et queue basse",bun:"et chignon",halfup:"demi-attaché"};
+const MHAIRS=(()=>{const backs=["crew","short","messy","spiky","wolf","mullet","curly","med","bob","long","wavy"],bangs=["short","irr","swL","swR","spiky","part"],R=rng(hash("mhair"));const combos=[];
+ backs.forEach(b=>bangs.forEach(g=>combos.push([b,g])));combos.sort(()=>R()-.5);const out=[];
+ for(let i=0;i<45;i++){const[b,g]=combos[i];const side=["crew","spiky","messy"].includes(b)?"none":(["long","med","wavy"].includes(b)?"long":"short");
+  const tie=(b==="med"&&i%3===0)?"ponyL":(b==="long"&&i%2===0)?"bun":(b==="wavy"&&i%2)?"halfup":null;const col=MCOL[(i*7)%MCOL.length],omb=i>=30?["#6ee7c8","#ff7eb6","#ffd166","#7cc4f5","#c4a6ff"][i%5]:null;
+  out.push([`${BACKN[b]}, ${BANGN[g]}${tie?" "+TIEN[tie]:""}`,b,g,side,tie,i%9===4?1:0,col[1],omb])}return out})();
+/* tenues garçon : nouveaux hauts et bas */
+const MTOP_EXTRA={
+ shirt:(o,X,O)=>O(G.TOP_L,o.c)+sleevesLong(o.c,X)+P("M100,132 L88,136 L94,146 Z",WHITE)+P(mir("M100,132 L88,136 L94,146 Z"),WHITE)+ln("M100,140 L100,238",shade(o.c,-.3),.6,.8)+[156,176,196,216].map(y=>`<circle cx="102" cy="${y}" r="1.3" fill="${WHITE}"/>`).join(""),
+ polo:(o,X,O)=>O(G.TOP_L,o.c)+P(G.SS_L,o.c)+P(G.SS_R,o.c)+P("M100,131 L86,134 L92,146 L100,142 Z",shade(o.c,.25))+P(mir("M100,131 L86,134 L92,146 L100,142 Z"),shade(o.c,.25))+ln("M100,142 L100,158",shade(o.c,-.3),.7,.9)+`<circle cx="100" cy="150" r="1.2" fill="${WHITE}"/>`,
+ varsity:(o,X,O)=>P(G.TOP_L,WHITE)+O("M69,137 C79,130 90,131 96,131 L96,240 L67,240 C68,226 71,216 72,206 C70,190 64,172 64,152 Z",o.c)+O(mir("M69,137 C79,130 90,131 96,131 L96,240 L67,240 C68,226 71,216 72,206 C70,190 64,172 64,152 Z"),o.c)+sleevesLong(o.k,X,o.c)+ln("M67,234 L96,234 M104,234 L133,234",WHITE,2,.9)+P(star(80,170,6),WHITE),
+ coat:(o,X,O)=>P(G.TOP_L,shade(o.c,.6))+O("M68,136 C80,130 90,131 96,131 L98,330 L56,330 C58,280 62,230 66,190 C64,170 62,156 64,150 Z",o.c)+O(mir("M68,136 C80,130 90,131 96,131 L98,330 L56,330 C58,280 62,230 66,190 C64,170 62,156 64,150 Z"),o.c)+sleevesLong(o.c,X)+P("M96,131 L82,166 L96,184 Z",shade(o.c,-.15))+P(mir("M96,131 L82,166 L96,184 Z"),shade(o.c,-.15))+[200,226,252].map(y=>`<circle cx="92" cy="${y}" r="2" fill="${o.k}"/>`).join("")+ln("M70,236 L94,236 M106,236 L130,236",shade(o.c,-.3),1.4,.8),
+ gakuran:(o,X,O)=>O(G.TOP_L,o.c)+sleevesLong(o.c,X,shade(o.c,.1))+P("M88,126 L112,126 L113,136 L87,136 Z",o.c)+ln("M100,136 L100,238",shade(o.c,.35),.7,.9)+[150,170,190,210,230].map(y=>`<circle cx="100" cy="${y}" r="1.9" fill="#ffd166" stroke="#a8740f" stroke-width=".4"/>`).join("")
+};
+const MBOT_EXTRA={
+ cargo:(o,X,O,cb)=>O(G.PANT_L,cb)+O(G.PANT_R,cb)+O(G.HIPS,cb)+P("M74,280 L88,280 L88,300 L75,300 Z",shade(cb,-.1))+P("M112,280 L126,280 L125,300 L112,300 Z",shade(cb,-.1))+ln("M88,240 L90,378 M112,240 L110,378",shade(cb,-.25),.6,.6),
+ hakama:(o,X,O,cb)=>O("M70,204 L130,204 L140,382 L104,382 L100,250 L96,382 L60,382 Z",cb)+[78,88,112,122].map(x=>ln(`M${x},210 L${x+(x-100)*.3},380`,shade(cb,-.3),.8,.8)).join(""),
+ joggers:(o,X,O,cb)=>O(G.HIPS,cb)+O(G.LG_L.replace("L97,380 L86,380","L97,372 L86,372"),cb)+O(G.LG_R.replace("L116,380 L105,380","L116,372 L105,372"),cb)+P("M85,366 L98,366 L98,378 L85,378 Z M104,366 L117,366 L117,378 L104,378 Z",shade(cb,-.15))+ln("M80,240 L86,364 M120,240 L114,364",WHITE,1.2,.8)
+};
+const MTOPS=["tee","tank","hoodie","sweater","turtle","jacket","vest","shirt","polo","varsity","coat","gakuran","bib"],MBOTS=["pants","jeans","wide","shorts","joggers","cargo","hakama"];
+const TOPNM={tee:"T-shirt",tank:"Débardeur",hoodie:"Sweat à capuche",sweater:"Pull",turtle:"Col roulé",jacket:"Veste",vest:"Gilet costume",shirt:"Chemise",polo:"Polo",varsity:"Blouson teddy",coat:"Long manteau",gakuran:"Uniforme gakuran",bib:"Salopette",robe:"Yukata"};
+const BOTNM={pants:"pantalon",jeans:"jean",wide:"pantalon large",shorts:"short",joggers:"jogging",cargo:"cargo",hakama:"hakama",robe:""};
+const MCLOTH=["noir","marine","gris","blanc","jean","kaki","bordeaux","chocolat","ciel","menthe","rouge","moutarde","creme","prune","sauge","corail","citron","lavande"];
+const MOUTFITS=(()=>{const R=rng(hash("mout")),combos=[];MTOPS.forEach(t=>MBOTS.forEach(b=>{if(t==="bib"&&!["pants","shorts"].includes(b))return;combos.push([t,b])}));combos.sort(()=>R()-.5);
+ const pats=[null,null,null,"stripes","check","plaid","dots","vstripes","stars"],out=[];
+ for(let i=0;i<75;i++){const[t,b]=i===74?["robe","robe"]:i===73?["robe","robe"]:combos[i%combos.length];const c=MCLOTH[(i*5)%MCLOTH.length],k=MCLOTH[(i*5+7)%MCLOTH.length];
+  const pat=i>=60?(i%2?"stars":null):pats[i%pats.length],pp=pat?(i%2?"top":"bot"):null;const ex={};if(i>=60){ex.back=i>=70?"wings":"cape";ex.belt=i%3===0?"#ffd166":null}
+  out.push([`${TOPNM[t]}${BOTNM[b]?" et "+BOTNM[b]:""} ${c}`,t,b,c,k,pat,pp,ex])}
+ out[73][0]="Yukata de nuit";out[74][0]="Yukata céleste";out[73][5]="stars";out[73][6]="bot";out[74][5]="stars";out[74][6]="bot";return out})();
+/* accessoires garçon */
+const accFn=n=>{const a=[...ACCS,...NEW_ACC.map(x=>x.slice(1))].find(x=>x[0]===n);return a?a[2]:()=>""};
+const accNeck=n=>{const a=[...ACCS,...NEW_ACC.map(x=>x.slice(1))].find(x=>x[0]===n);return a?!!a[3]:false};
+const MACC_NEW={
+ "Casquette à l'envers":c=>P("M58,46 C58,8 142,8 142,46 Z",c)+P("M136,40 Q160,36 170,46 Q150,50 134,46 Z",shade(c,-.15))+`<circle cx="100" cy="12" r="2.4" fill="${shade(c,.3)}"/>`,
+ "Bob":c=>P("M58,44 C58,10 142,10 142,44 Z",c)+P("M44,44 Q100,56 156,44 L150,56 Q100,66 50,56 Z",shade(c,-.12))+ln("M60,40 Q100,46 140,40",shade(c,-.3),.8,.8),
+ "Bandana":c=>P("M58,40 Q100,28 142,40 L142,50 Q100,38 58,50 Z",c)+P("M140,42 L158,50 L150,60 Z M140,46 L152,62 L144,64 Z",c)+[70,84,98,112,126].map(x=>`<circle cx="${x}" cy="${44-(x-100)*0}" r="1" fill="#fff"/>`).join(""),
+ "Lunettes de soleil":c=>pa("M72,72 L97,72 L95,88 L74,88 Z M103,72 L128,72 L126,88 L105,88 Z",c,"#111",1.2,'fill-opacity=".9"')+ln("M97,76 L103,76",c,1.6,1)+ln("M76,75 L84,75",'#ffffff',1,.6),
+ "Chaîne dorée":c=>ln("M86,124 Q100,150 114,124",c,1.6,1)+ln("M86,124 Q100,150 114,124",shade(c,-.3),.5,1)+P("M97,146 L103,146 L103,154 L97,154 Z",c),
+ "Pansement":c=>pa("M112,90 L124,86 L126,92 L114,96 Z",c,"#d9b8a0",.5)+`<circle cx="117" cy="91" r=".5" fill="#c99"/><circle cx="121" cy="89.5" r=".5" fill="#c99"/>`,
+ "Boucle croix":c=>ln("M61,92 L61,102 M57,96 L65,96",c,1.4,1),
+ "Masque de renard":c=>P("M138,30 C154,26 164,40 160,58 C156,66 146,66 140,58 L136,40 Z",c)+P("M142,30 L146,18 L152,30 Z M156,32 L162,22 L162,36 Z",c)+ln("M144,46 Q148,44 152,46",'#d63a3a',1.4,1)+ln("M146,54 Q150,56 154,54",'#d63a3a',1,1),
+ "Bandeau ninja":c=>P("M58,42 Q100,30 142,42 L142,52 Q100,40 58,52 Z",c)+P("M88,36 L112,36 L112,46 L88,46 Z","#c9c9d6")+P("M140,44 L160,54 L156,58 Z M140,48 L156,66 L150,66 Z",c),
+ "Visière":c=>P("M58,40 Q100,30 142,40 L142,46 Q100,36 58,46 Z",c)+P("M64,44 Q100,38 136,44 Q120,60 100,62 Q80,60 64,44 Z",shade(c,-.1)).replace("fill=","fill-opacity=\".75\" fill="),
+ "Cache-œil":c=>P("M108,72 L124,72 C126,80 124,88 116,90 C110,88 106,80 108,72 Z",c)+ln("M60,60 L108,74 M124,74 L140,66",c,1.2,1),
+ "Bonnet simple":c=>P("M56,52 C54,4 146,4 144,52 Z",c)+P("M54,46 L146,46 L146,58 L54,58 Z",shade(c,-.12))+[62,72,82,92,102,112,122,132,142].map(x=>ln(`M${x},47 L${x},57`,shade(c,-.3),.6,.7)).join(""),
+ "Collier dent de requin":c=>ln("M88,124 Q100,146 112,124","#6b4430",1,1)+P("M97,144 L103,144 L100,154 Z",c),
+ "Écouteurs":c=>`<circle cx="60" cy="86" r="3.4" fill="${c}" stroke="${od(c)}" stroke-width=".6"/><circle cx="140" cy="86" r="3.4" fill="${c}" stroke="${od(c)}" stroke-width=".6"/>`,
+ "Badge étoile":c=>P(star(78,166,6),c),
+ "Chapeau melon":c=>P("M62,40 C62,4 138,4 138,40 Z",c)+`<ellipse cx="100" cy="42" rx="52" ry="7" fill="${c}" stroke="${od(c)}" stroke-width=".7"/>`+P("M64,32 L136,32 L137,38 L63,38 Z",shade(c,.3)),
+ "Couronne de lauriers":c=>ln("M58,48 C64,22 136,22 142,48",'#3f6b4a',1.6,1)+Array.from({length:12},(_,i)=>{const x=60+i*7,y=26+Math.pow((x-100)/40,2)*20;return`<ellipse cx="${x}" cy="${y.toFixed(1)}" rx="4" ry="2" fill="${c}" transform="rotate(${x<100?-30:30} ${x} ${y.toFixed(1)})"/>`}).join("")
+};
+const MACC_LIST=[
+ ["Casquette","Casquette","#2f3e7a"],["Casquette à l'envers","Casquette à l'envers","#d63a3a"],["Bob","Bob","#7d7a4f"],["Bonnet simple","Bonnet simple","#2b2734"],["Bonnet à pompon","Bonnet","#4a6fa5"],["Bandana","Bandana","#d63a3a"],
+ ["Bandeau sport","Bandeau sport","#f4f4fa"],["Lunettes rondes","Lunettes rondes","#2b2734"],["Lunettes carrées","Lunettes carrées","#6b4430"],["Lunettes de soleil","Lunettes de soleil","#1b1820"],["Casque audio","Casque audio","#2b2734"],
+ ["Écouteurs","Écouteurs","#f4f4fa"],["Écharpe","Écharpe","#2f3e7a"],["Chaîne dorée","Chaîne dorée","#ffd166"],["Collier dent de requin","Collier dent de requin","#f4f4fa"],["Pansement","Pansement","#ffe2c8"],
+ ["Boucle croix","Boucle croix","#c9c9d6"],["Boucles étoiles","Boucles étoiles","#c9c9d6"],["Badge étoile","Badge étoile","#ffd166"],["Béret","Béret","#2b2734"],["Chapeau de paille","Chapeau de paille","#e8c77c"],
+ ["Chapeau melon","Chapeau melon","#2b2734"],["Visière","Visière","#6ee7c8"],["Bandeau ninja","Bandeau ninja","#2f3e7a"],["Cache-œil","Cache-œil","#1b1820"],["Petites cornes","Petites cornes","#7d2638"],
+ ["Oreilles de chat","Oreilles de chat","#22202b"],["Masque de renard","Masque de renard","#f4f4fa"],["Pendentif lune","Pendentif lune","#c9c9d6"],["Couronne de lauriers","Couronne de lauriers","#8fae8b"],
+ ["Oreilles de renard","Oreilles de renard","#b8492f"],["Lunettes étoiles","Lunettes étoiles","#7cc4f5"],["Plume dorée","Plume dorée","#ffd166"],["Pince lune","Pince lune","#9fc4e6"],["Couronne dorée","Couronne dorée","#ffd166"],
+ ["Tiare","Tiare","#9fc4e6"],["Auréole","Auréole","#ffe066"],["Corne de licorne","Corne de licorne","#c4a6ff"],["Bandeau de perles","Bandeau de perles","#e8e8f2"],["Pendentif cœur","Pendentif cœur","#d63a3a"],
+ ["Ailes de tête","Ailes de tête","#2b2734"],["Couronne de cristal","Couronne de cristal","#bfe8ff"],["Halo d'étoiles","Halo d'étoiles","#ffe066"],["Oreilles de chat cosmiques","Oreilles de chat cosmiques","#2b2134"],["Familier lune","Familier lune","#ffe066"]
+];
+const MSHOE_NEW={
+ "Chaussures de skate":c=>P(FL,c)+P(FR,c)+P("M78,394 L99,394 L99,401 L77,401 Z M103,394 L125,394 L126,401 L103,401 Z","#f4f4fa")+ln("M82,388 L96,386 M106,386 L120,388","#f4f4fa",1.4,.9),
+ "Running":c=>P(FL,c)+P(FR,c)+P("M78,396 L99,396 L99,401 L77,401 Z M103,396 L125,396 L126,401 L103,401 Z","#f4f4fa")+ln("M80,392 Q88,386 96,390 M104,390 Q112,386 120,392",shade(c,.5),1.6,.9),
+ "Derbies":c=>P(FL,c)+P(FR,c)+ln("M88,384 L94,386 M88,387 L94,389 M107,386 L113,384 M107,389 L113,387",shade(c,.45),.6,1)+P("M78,398 L99,398 L99,401 L78,401 Z M103,398 L125,398 L125,401 L103,401 Z",shade(c,-.35)),
+ "Geta":c=>P(FL,"#ffe3d3")+P(FR,"#ffe3d3")+P("M76,398 L99,398 L99,402 L76,402 Z M103,398 L126,398 L126,402 L103,402 Z",c)+P("M80,402 L84,402 L84,407 L80,407 Z M92,402 L96,402 L96,407 L92,407 Z M107,402 L111,402 L111,407 L107,407 Z M119,402 L123,402 L123,407 L119,407 Z",shade(c,-.2))+ln("M86,384 L90,392 L94,384 M108,384 L112,392 L116,384","#d63a3a",1.4,1),
+ "Bottes de motard":c=>P("M80,340 L98,340 L97,386 L85,386 Z",c)+P("M102,340 L120,340 L117,386 L105,386 Z",c)+P(FL,c)+P(FR,c)+P("M80,372 L98,372 L98,376 L81,376 Z M102,372 L120,372 L119,376 L102,376 Z","#c9c9d6")+P("M78,397 L99,397 L99,402 L78,402 Z M103,397 L125,397 L125,402 L103,402 Z","#1b1820"),
+ "Chaussons":c=>P("M82,384 C74,386 74,400 84,401 L96,401 C102,399 101,388 96,384 Z",c)+P("M118,384 C126,386 126,400 116,401 L104,401 C98,399 99,388 104,384 Z",c),
+ "Tongs":c=>P(FL,"#ffe3d3")+P(FR,"#ffe3d3")+P("M77,397 L98,397 L98,401 L77,401 Z M104,397 L125,397 L125,401 L104,401 Z",c)+ln("M86,384 L90,394 L94,384 M108,384 L112,394 L116,384",c,1.4,1)
+};
+const shoeFn=n=>{const a=[...SHOES,...NEW_SHOES.map(x=>x.slice(1))].find(x=>x[0]===n);return a?a[1]:null};
+const MSHOE_LIST=[
+ ["Baskets blanches","Baskets blanches","#f4f4fa"],["Baskets noires","Baskets blanches","#2b2734"],["Baskets montantes","Baskets montantes","#2f3e7a"],["Chaussures de skate","Chaussures de skate","#4a6fa5"],["Running","Running","#d63a3a"],
+ ["Derbies","Derbies","#6b4430"],["Mocassins et chaussettes","Mocassins et chaussettes","#2b2734"],["Bottines lacées","Bottines lacées","#7a5236"],["Bottes de pluie","Bottes de pluie","#3f6b4a"],["Sandales d'été","Sandales d'été","#6b4430"],
+ ["Geta","Geta","#a8653a"],["Rangers","Rangers","#22202b"],["Bottes de motard","Bottes de motard","#2b2734"],["Chaussons","Chaussons","#8a8a96"],["Tongs","Tongs","#2f3e7a"],
+ ["Après-ski","Après-ski","#4a3226"],["Patins à roulettes","Patins à roulettes","#d63a3a"],["Baskets pastel","Baskets pastel","#9fc4e6"],["Baskets néon","Baskets néon","#ffe066"],["Chaussettes rayées","Chaussettes rayées","#2f3e7a"],
+ ["Chaussettes hautes noires","Chaussettes hautes noires","#f4f4fa"],["Bottes cavalières","Bottes cavalières","#22202b"],["Sabots","Sabots fleuris","#6b4430"],["Bottes en cuir","Bottes en cuir blanc","#4a3226"],["Bottes hautes","Bottes hautes","#6e2235"],
+ ["Baskets montantes rouges","Baskets montantes","#d63a3a"],["Running néon","Running","#6ee7c8"],["Derbies vernies","Derbies","#1b1820"],["Bottines à fourrure","Bottines à fourrure","#7a5236"],["Skate rayées","Chaussures de skate","#2b2734"],
+ ["Bottes à lacets dorés","Bottes à lacets dorés","#22202b"],["Rangers cloutés","Rangers cloutés","#3a3748"],["Baskets holographiques","Baskets holographiques","#c2c4d2"],["Bottes de pluie étoile","Bottes de pluie","#2b3a73"],["Mocassins et chaussettes nuage","Mocassins et chaussettes nuage","#4a3226"],
+ ["Motard argent","Bottes de motard","#c2c4d2"],["Geta laquées","Geta","#6e2235"],["Bottes fourrure glacier","Bottes fourrure lilas","#9fc4e6"],["Running holographique","Running","#c4a6ff"],["Derbies dorées","Derbies","#d9a441"],
+ ["Baskets ailées","Baskets ailées","#f4f4fa"],["Bottes galaxie","Bottes galaxie","#141320"],["Patins arc-en-ciel","Patins arc-en-ciel","#ffffff"],["Bottes de fée","Bottes de fée","#3f6b4a"],["Pantoufles de verre","Pantoufles de verre","#dff3ff"]
+];
+const CATALOG_F=CATALOG,CATALOG_M={hair:[],outfit:[],acc:[],shoes:[]};
+(function buildM(){
+ const cp=(it,fid)=>{const f=ITEM[fid];it.r=f.r;it.price=f.price;it.g="m";ITEM[it.id]=it;return it};
+ MHAIRS.forEach((d,i)=>CATALOG_M.hair.push(cp({cat:"hair",id:"mh"+i,d,name:d[0],k:"#2b2734"},"h"+i)));
+ MOUTFITS.forEach((o,i)=>{const e=o[7]||{};CATALOG_M.outfit.push(cp({cat:"outfit",id:"mo"+i,name:o[0],o:{top:o[1],bot:o[2],c:C_(o[3]),k:C_(o[4]),pat:o[5],pp:o[6],belt:e.belt,back:e.back}},"o"+i))});
+ MACC_LIST.forEach((a,i)=>{const f=MACC_NEW[a[1]]||accFn(a[1]);CATALOG_M.acc.push(cp({cat:"acc",id:"ma"+i,name:a[0],c:a[2],f,neck:["Chaîne dorée","Collier dent de requin","Badge étoile"].includes(a[1])||accNeck(a[1])},"a"+i))});
+ MSHOE_LIST.forEach((s,i)=>{const f=MSHOE_NEW[s[1]]||shoeFn(s[1])||(c=>P(FL,c)+P(FR,c));CATALOG_M.shoes.push(cp({cat:"shoes",id:"mf"+i,name:s[0],f,c:s[2]},"f"+i))});
+ const LP=["sparkle","embers","snow","bubbles","stars","notes","confetti","rainbow","beam","galaxy","feathers","petals"],AU=["#7cc4f5","#ffcf5a","#6ee7c8","#c4a6ff","#ff9f55","#ffffff"];const cmb=[];for(let a=0;a<LP.length;a++)for(let b=a+1;b<LP.length;b++)cmb.push([LP[a],LP[b]]);{const Rc=rng(hash("mcombos"));cmb.sort(()=>Rc()-.5)}let li=0;
+ for(const cat in CATALOG_M)for(const it of CATALOG_M[cat]){if(it.r===3){it.fx=["aura",...cmb[li%cmb.length]];it.fxc=AU[li%AU.length];li++}else if(it.r===2){const pool=["sparkle","bubbles","glow","embers","snow"];it.fx=[pool[hash(it.id)%pool.length]];it.fxc=it.c&&it.cat!=="hair"?it.c:"#7cc4f5"}}
+ const none={id:"ma_none",cat:"acc",name:"Aucun accessoire",price:0,r:0,g:"m"};ITEM.ma_none=none;CATALOG_M.acc.unshift(none);
+ for(const cat in CATALOG_M)CATALOG_M[cat].sort((a,b)=>a.price-b.price);
+})();
+const DEF_WEAR_M={hair:(CATALOG_M.hair.find(x=>x.d[1]==="short"&&x.r<2)||CATALOG_M.hair.find(x=>["crew","messy"].includes(x.d[1]))).id,outfit:(CATALOG_M.outfit.find(x=>x.o.top==="tee"&&["jeans","pants"].includes(x.o.bot)&&!x.o.back)||CATALOG_M.outfit.find(x=>x.o.top==="tee")).id,acc:"ma_none",shoes:"mf0"};
+[DEF_WEAR_M.hair,DEF_WEAR_M.outfit,DEF_WEAR_M.shoes].forEach(id=>{ITEM[id].price=0;ITEM[id].r=0;delete ITEM[id].fx});
+for(const cat in CATALOG_M)CATALOG_M[cat].sort((a,b)=>a.price-b.price);
+const isM=()=>S&&S.gender==="m";
+const CAT=()=>isM()?CATALOG_M:CATALOG_F;
+const W=()=>isM()?S.wearM:S.wear;
+
 /* ---------- rendu ---------- */
 let UID=0;
 function charSVG(w,h,vb,lite){
- const id="cg"+(UID++);const H=ITEM[w.hair]||ITEM[DEF_WEAR.hair],O=ITEM[w.outfit]||ITEM[DEF_WEAR.outfit],A=ITEM[w.acc]||ITEM.a_none,Fs=ITEM[w.shoes]||ITEM[DEF_WEAR.shoes];
+ const id="cg"+(UID++);const male=(w.hair||"").startsWith("mh");const DW=male?DEF_WEAR_M:DEF_WEAR;const H=ITEM[w.hair]||ITEM[DW.hair],O=ITEM[w.outfit]||ITEM[DW.outfit],A=ITEM[w.acc]||ITEM[DW.acc],Fs=ITEM[w.shoes]||ITEM[DW.shoes];
  const X={id,lite:!!lite,R:rng(hash(H.id+O.id)),F:`filter="url(#${id}f)"`};
  const col=H.d[6],omb=H.d[7],S=`url(#${id}s)`;
  const bangD=BANG[H.d[2]];
- const eye=`<g id="${id}e"><path d="${G.SCL}" fill="#fffafc"/><g clip-path="url(#${id}sc)"><ellipse cx="84.5" cy="79.5" rx="9.2" ry="11.2" fill="url(#${id}i)" stroke="#2a1145" stroke-width=".9"/><ellipse cx="84.5" cy="72" rx="10" ry="5.5" fill="#1e0a33" opacity=".55"/><ellipse cx="84.5" cy="80.5" rx="3.3" ry="5" fill="#1a0829"/><path d="M77,84 Q84.5,93 92,84 Q84.5,88.5 77,84 Z" fill="#fbe0ff" opacity=".85"/>${lite?"":Array.from({length:18},(_,i)=>{const a=i/18*Math.PI*2;return ln(`M${(84.5+Math.cos(a)*3.6).toFixed(1)},${(79.5+Math.sin(a)*4.4).toFixed(1)} L${(84.5+Math.cos(a)*7.6).toFixed(1)},${(79.5+Math.sin(a)*9.4).toFixed(1)}`,i%2?"#f0d2ff":"#3a1a66",.4,.55)}).join("")}<path d="M70,77 Q82,64 98,71 L98,75 Q83,68.5 71,81 Z" fill="#b9a2e0" opacity=".55"/></g><ellipse cx="80.6" cy="74.5" rx="3" ry="4.2" fill="#fff" transform="rotate(-22 80.6 74.5)"/><circle cx="89.2" cy="85.6" r="1.4" fill="#fff"/><path d="M66.8,76.5 Q69.5,70 78,66.4 Q88.5,63 99.3,70 L99.6,72.6 Q88.5,67.2 78.2,69.4 Q71.2,71.8 68.8,78.6 Z" fill="#2a1520"/><path d="M68,76 L62.5,72.6 L67.6,73.6 Z M69.6,71.8 L64.8,67 L70.6,69.6 Z M73.8,68.6 L70.6,63.4 L75.6,67.2 Z" fill="#2a1520"/>${ln("M72,65.6 Q84,59 97.5,64.6","#c98e7a",.8,.75)}${ln("M76,89.6 Q85,92.4 93.4,88.6","#7a4a5a",.8,1)}</g>`;
+ const eye=`<g id="${id}e"><path d="${G.SCL}" fill="#fffafc"/><g clip-path="url(#${id}sc)"><ellipse cx="84.5" cy="79.5" rx="9.2" ry="11.2" fill="url(#${id}i)" stroke="#2a1145" stroke-width=".9"/><ellipse cx="84.5" cy="72" rx="10" ry="5.5" fill="#1e0a33" opacity=".55"/><ellipse cx="84.5" cy="80.5" rx="3.3" ry="5" fill="#1a0829"/><path d="M77,84 Q84.5,93 92,84 Q84.5,88.5 77,84 Z" fill="#fbe0ff" opacity=".85"/>${lite?"":Array.from({length:18},(_,i)=>{const a=i/18*Math.PI*2;return ln(`M${(84.5+Math.cos(a)*3.6).toFixed(1)},${(79.5+Math.sin(a)*4.4).toFixed(1)} L${(84.5+Math.cos(a)*7.6).toFixed(1)},${(79.5+Math.sin(a)*9.4).toFixed(1)}`,i%2?"#f0d2ff":"#3a1a66",.4,.55)}).join("")}<path d="M70,77 Q82,64 98,71 L98,75 Q83,68.5 71,81 Z" fill="#b9a2e0" opacity=".55"/></g><ellipse cx="80.6" cy="74.5" rx="3" ry="4.2" fill="#fff" transform="rotate(-22 80.6 74.5)"/><circle cx="89.2" cy="85.6" r="1.4" fill="#fff"/><path d="M66.8,76.5 Q69.5,70 78,66.4 Q88.5,63 99.3,70 L99.6,72.6 Q88.5,67.2 78.2,69.4 Q71.2,71.8 68.8,78.6 Z" fill="#2a1520"/>${male?"":'<path d="M68,76 L62.5,72.6 L67.6,73.6 Z M69.6,71.8 L64.8,67 L70.6,69.6 Z M73.8,68.6 L70.6,63.4 L75.6,67.2 Z" fill="#2a1520"/>'}${ln("M72,65.6 Q84,59 97.5,64.6","#c98e7a",.8,.75)}${ln("M76,89.6 Q85,92.4 93.4,88.6","#7a4a5a",.8,1)}</g>`;
  const pat=O.o.pat?PATS[O.o.pat](id+"p",O.o.pp==="top"?shade(O.o.c,-.35):(O.o.pat==="flowers"||O.o.pat==="dots"||O.o.pat==="stars"?"#ffffff":shade(O.o.k2||O.o.k,-.35))):"";
  const defs=`<defs><linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3ec"/><stop offset="1" stop-color="#ffe2d4"/></linearGradient>
  <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(col,.15)}"/><stop offset=".5" stop-color="${col}"/>${omb?`<stop offset=".72" stop-color="${shade(col,-.15)}"/><stop offset="1" stop-color="${omb}"/>`:`<stop offset="1" stop-color="${shade(col,-.3)}"/>`}</linearGradient>
@@ -592,14 +711,14 @@ function charSVG(w,h,vb,lite){
  s+=outfitSVG(O.o,X).replace(/url\(#__s\)/g,S);
  s+=pa(G.HAND_L,S,SKL)+pa(G.HAND_R,S,SKL)+(lite?"":ln("M51,250 L51.6,256 M54.4,251 L54.8,257 M57,250 L57.4,255","#c98e7a",.45,1)+ln("M120,213 Q123,212 125,214","#c98e7a",.45,1));
  if(A.neck)s+=A.f(A.c);
- const E=`<use href="#${id}e" transform="translate(84.5 80) scale(.8) translate(-84.5 -78)"/>`,E2=`<use href="#${id}e" transform="translate(200,0) scale(-1,1) translate(84.5 80) scale(.8) translate(-84.5 -78)"/>`;
+ const BR=male?ln("M74,60 Q84,56 94,59",shade(H.d[6],-.4),1.8,.85)+ln("M126,60 Q116,56 106,59",shade(H.d[6],-.4),1.8,.85):"";const E=`<use href="#${id}e" transform="translate(84.5 80) scale(${male?.72:.8}) translate(-84.5 -78)"/>`,E2=`<use href="#${id}e" transform="translate(200,0) scale(-1,1) translate(84.5 80) scale(${male?.72:.8}) translate(-84.5 -78)"/>`;
  s+=`<g transform="rotate(-4 100 120)">`+pa(G.EAR,S,SKL)+pa(mir(G.EAR),S,SKL)+pa(G.FACE,S,SKL)+
   (lite?"":pa("M64,62 C72,74 86,70 100,68 C114,70 128,74 136,62 L136,54 L64,54 Z","#e8a491",0,0,`opacity=".6" ${X.F}`))+
   `<g class="ey">${E}</g><g class="ey">${E2}</g>`+
-  `<ellipse cx="77" cy="94" rx="10" ry="5" fill="url(#${id}c)"/><ellipse cx="123" cy="94" rx="10" ry="5" fill="url(#${id}c)"/>`+
-  (lite?"":ln("M73,95 L75,92 M76.5,95.5 L78.5,92.5 M80,95.5 L82,92.5 M120,95.5 L122,92.5 M123.5,95.5 L125.5,92.5 M127,95 L129,92","#ff6f8f",.5,.75))+
-  ln("M100.6,92.6 L99.2,95.6","#cf8d7a",.8,1)+ln("M95.5,102.6 Q98,104 100,102.8 Q102,104 104.5,102.6","#9b3c52",.9,1)+pa("M97,103.6 Q100,107.4 103,103.6 Q100,104.8 97,103.6 Z","#c4566b",0,0,'opacity=".75"')+
-  `<g class="hf">${hairSVG(H,X,"front")}</g>`+(A.f&&!A.neck?A.f(A.c):"")+`</g>`+FXs.front;
+  `<ellipse cx="77" cy="94" rx="10" ry="5" fill="url(#${id}c)" opacity="${male?.35:1}"/><ellipse cx="123" cy="94" rx="10" ry="5" fill="url(#${id}c)" opacity="${male?.35:1}"/>`+
+  (lite||male?"":ln("M73,95 L75,92 M76.5,95.5 L78.5,92.5 M80,95.5 L82,92.5 M120,95.5 L122,92.5 M123.5,95.5 L125.5,92.5 M127,95 L129,92","#ff6f8f",.5,.75))+
+  ln("M100.6,92.6 L99.2,95.6","#cf8d7a",.8,1)+(male?ln("M96,103 Q100,104.6 104,103","#8a4a52",.9,1):ln("M95.5,102.6 Q98,104 100,102.8 Q102,104 104.5,102.6","#9b3c52",.9,1))+(male?"":pa("M97,103.6 Q100,107.4 103,103.6 Q100,104.8 97,103.6 Z","#c4566b",0,0,'opacity=".75"'))+
+  `<g class="hf">${hairSVG(H,X,"front")}</g>`+BR+(A.f&&!A.neck?A.f(A.c):"")+`</g>`+FXs.front;
  const v=vb||[38,-14,124,422];
  return `<svg class="ch" viewBox="${v.join(" ")}" ${h?`height="${h}" width="${Math.round(h*v[2]/v[3])}"`:""}>${s}</svg>`;
 }
@@ -643,7 +762,7 @@ function load(){
  S.weeks=S.weeks||{};S.settings=Object.assign({threshold:60,compet:true,sound:true,rem:false,remN:3,remAsked:false},S.settings||{});
  if((S.v||0)<3){S.v=3;S.spent=0;S.owned=[DEF_WEAR.hair,DEF_WEAR.outfit,DEF_WEAR.shoes,"a_none"];S.wear=Object.assign({},DEF_WEAR);delete S.skin}
  if((S.v||0)<4){S.v=4;S.cats=JSON.parse(JSON.stringify(DEFAULT_CATS))}
- S.owned=S.owned||[];S.wear=Object.assign({},DEF_WEAR,S.wear||{});S.spent=S.spent||0;
+ S.owned=S.owned||[];S.wear=Object.assign({},DEF_WEAR,S.wear||{});S.wearM=Object.assign({},DEF_WEAR_M,S.wearM||{});["ma_none",DEF_WEAR_M.hair,DEF_WEAR_M.outfit,DEF_WEAR_M.shoes].forEach(id=>{if(!S.owned.includes(id))S.owned.push(id)});S.spent=S.spent||0;
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));storageOK=true}catch(e){storageOK=false}}
 const sumPts=()=>100;
@@ -717,7 +836,7 @@ const stage=(w,h)=>`<div class="stage" id="stage"><div class="ava" id="ava">${ch
 
 function vMissions(){
  const ml=mList(today()),r=dayRec(today()),t=C.today,thr=+S.settings.threshold||60,comp=S.settings.compet,combo=t.success?t.mult:multFor(C.streak+1);
- return `<div class="hero">${stage(S.wear,150)}
+ return `<div class="hero">${stage(W(),150)}
   <div class="card" style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:6px;padding-top:28px">
    <div class="row sb"><div class="score">${t.pct}<small> / 100 pts</small></div>${comp&&combo>1?`<span class="tag" style="background:linear-gradient(180deg,#ff9cc8,var(--pink));color:#2a0d1d">Combo x${dec(combo)}</span>`:""}</div>
    <div class="bar ${t.success?"ok":""}"><i style="width:${Math.min(100,t.pct)}%"></i><span class="mk" style="left:${thr}%"></span></div>
@@ -745,8 +864,8 @@ function vQuetes(){
 }
 const CAT_LBL={hair:"Cheveux",outfit:"Tenues",acc:"Accessoires",shoes:"Chaussures"};
 function vShop(){
- const list=CATALOG[shopCat],per=15,pages=Math.ceil(list.length/per);shopPage=Math.min(shopPage,pages-1);
- const sel=ITEM[shopSel]||ITEM[S.wear[shopCat]],owned=S.owned.includes(sel.id),eq=S.wear[shopCat]===sel.id,try_=Object.assign({},S.wear,{[sel.cat]:sel.id});
+ const list=CAT()[shopCat],per=15,pages=Math.ceil(list.length/per);shopPage=Math.min(shopPage,pages-1);
+ const sel=ITEM[shopSel]||ITEM[W()[shopCat]],owned=S.owned.includes(sel.id),eq=W()[shopCat]===sel.id,try_=Object.assign({},W(),{[sel.cat]:sel.id});
  const rar=RARITY[sel.r];
  const btn=eq?`<button class="btn alt" disabled>Équipé</button>`:owned?`<button class="btn m" data-act="equip" data-v="${sel.id}">Équiper</button>`
   :`<button class="btn g" data-act="buy" data-v="${sel.id}" ${C.coins<sel.price?"disabled":""}>Acheter <i class="coin" style="width:12px;height:12px;vertical-align:-2px"></i> ${sel.price}</button>`;
@@ -758,8 +877,8 @@ function vShop(){
    <div class="sm dim">${owned?"Débloqué":!owned&&C.coins<sel.price?`Il te manque ${sel.price-C.coins} pièces`:`${sel.price} pièces`}</div>
    ${btn}<div class="sm dim b">Collection ${own} / ${tot}</div></div></div>
  <div class="ctabs">${Object.keys(CAT_LBL).map(k=>`<button class="${shopCat===k?"on":""}" data-act="scat" data-v="${k}">${CAT_LBL[k]}</button>`).join("")}</div>
- <div class="shopgrid">${list.slice(shopPage*per,shopPage*per+per).map(it=>{const o=S.owned.includes(it.id),w=Object.assign({},S.wear,{[it.cat]:it.id});
-  return `<div class="sk ${it.id===sel.id?"sel":""} ${o?"":"lock"}" data-act="pick" data-v="${it.id}">${S.wear[it.cat]===it.id?'<span class="eq"></span>':""}
+ <div class="shopgrid">${list.slice(shopPage*per,shopPage*per+per).map(it=>{const o=S.owned.includes(it.id),w=Object.assign({},W(),{[it.cat]:it.id});
+  return `<div class="sk ${it.id===sel.id?"sel":""} ${o?"":"lock"}" data-act="pick" data-v="${it.id}">${W()[it.cat]===it.id?'<span class="eq"></span>':""}
    ${charSVG(w,0,CROP[it.cat],true)}<span class="p">${o?`<span style="color:var(--mint)">OK</span>`:`<i class="coin" style="width:9px;height:9px"></i>${it.price}`}</span><span class="rb" style="background:${RARITY[it.r][1]}"></span></div>`}).join("")}</div>
  <div class="pager"><button data-act="page" data-v="-1" ${shopPage===0?"disabled":""}>&lt;</button><span class="sm dim b">${shopPage+1} / ${pages}</span><button data-act="page" data-v="1" ${shopPage>=pages-1?"disabled":""}>&gt;</button></div>`;
 }
@@ -810,7 +929,7 @@ function wheelSVG(rot){
 function vWheel(){
  const r=dayRec(today()),sp=r.spin,rot=sp?-(sp.idx*45):0;
  const res=sp?(sp.c?`Gagné : ${sp.c} pièce${sp.c>1?"s":""}`:sp.s?`Gagné : ${esc(ITEM[sp.s]?ITEM[sp.s].name:"un skin")}`:"Défi du jour débloqué"):"1 tour gratuit par jour";
- const remain=k=>{const all=[];for(const c in CATALOG)CATALOG[c].forEach(it=>{if(it.r===k&&it.id!=="a_none")all.push(it)});return[all.filter(it=>!S.owned.includes(it.id)).length,all.length]};
+ const remain=k=>{const all=[];for(const c in CAT())CAT()[c].forEach(it=>{if(it.r===k&&it.id!=="a_none"&&it.id!=="ma_none")all.push(it)});return[all.filter(it=>!S.owned.includes(it.id)).length,all.length]};
  return `<div class="row sb" style="flex:none"><span class="ttl">Roue de la chance</span><span class="sm dim b">${res}</span></div>
  <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
   <div id="wheelBox" style="height:min(34vh,250px);aspect-ratio:1">${wheelSVG(rot)}</div>
@@ -837,13 +956,13 @@ function openReel(cards,win,onDone){
  let last=-1,run=true;const tick=()=>{if(!run)return;const m=new DOMMatrixReadOnly(getComputedStyle(strip).transform),pos=-m.m41+W/2,idx=Math.floor(pos/(CW+GAP));if(idx!==last){last=idx;tone(1700,0,.035,"square",.04);tone(900,0,.02,"triangle",.05)}requestAnimationFrame(tick)};requestAnimationFrame(tick);
  setTimeout(()=>{run=false;const card=strip.children[win];card.style.boxShadow=`0 0 0 3px ${cards[win].color},0 0 22px ${cards[win].color}`;SFX.ok();setTimeout(onDone,900)},6200);
 }
-const itemCard=it=>({color:RARITY[it.r][1],html:`<div style="height:84px;display:flex;align-items:center">${charSVG(Object.assign({},S.wear,{[it.cat]:it.id}),0,CROP[it.cat],true).replace('<svg ','<svg style="height:84px;width:auto" ')}</div><div style="font-size:9px;font-weight:800;text-align:center;padding:0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92px">${esc(it.name)}</div>`});
+const itemCard=it=>({color:RARITY[it.r][1],html:`<div style="height:84px;display:flex;align-items:center">${charSVG(Object.assign({},W(),{[it.cat]:it.id}),0,CROP[it.cat],true).replace('<svg ','<svg style="height:84px;width:auto" ')}</div><div style="font-size:9px;font-weight:800;text-align:center;padding:0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:92px">${esc(it.name)}</div>`});
 const coinCol=v=>v>=100?"#ffcf5a":v>=20?"#ff7eb6":v>=10?"#c08bff":v>=5?"#6fb6ff":"#b9bdd6";
 const coinCard=v=>({color:coinCol(v),html:`<i class="coin" style="width:${v>=100?44:v>=20?38:32}px;height:${v>=100?44:v>=20?38:32}px"></i><div style="font-size:20px;font-weight:900;margin-top:6px;color:${coinCol(v)}">+${v}</div>`});
 const rollDaily=()=>{let x=Math.random()*100;for(const[v,p]of DAILY){if(x<p)return v;x-=p}return 2};
-function grantRandom(k){const pool=[];for(const c in CATALOG)CATALOG[c].forEach(it=>{if(it.r===k&&it.id!=="a_none"&&!S.owned.includes(it.id))pool.push(it)});if(!pool.length)return null;const it=pool[Math.floor(Math.random()*pool.length)];S.owned.push(it.id);return it}
-function rewardOverlay(it,title){const w=Object.assign({},S.wear,{[it.cat]:it.id});
- overlay(title,`${RARITY[it.r][0]} . ${it.name}`,w,`<button class="btn m" style="margin-top:14px;position:relative" onclick="event.stopPropagation();S.wear['${it.cat}']='${it.id}';save();document.getElementById('over').click();render()">Équiper</button>`);
+function grantRandom(k){const pool=[];for(const c in CAT())CAT()[c].forEach(it=>{if(it.r===k&&it.id!=="a_none"&&it.id!=="ma_none"&&!S.owned.includes(it.id))pool.push(it)});if(!pool.length)return null;const it=pool[Math.floor(Math.random()*pool.length)];S.owned.push(it.id);return it}
+function rewardOverlay(it,title){const w=Object.assign({},W(),{[it.cat]:it.id});
+ overlay(title,`${RARITY[it.r][0]} . ${it.name}`,w,`<button class="btn m" style="margin-top:14px;position:relative" onclick="event.stopPropagation();W()['${it.cat}']='${it.id}';save();document.getElementById('over').click();render()">Équiper</button>`);
  SFX[it.r>=3?"legend":it.r===2?"perfect":"buy"]();}
 let spinning=false;
 function doSpin(){
@@ -904,8 +1023,8 @@ const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
 function installBtn(){
  let b=document.getElementById("instBtn");
  if(isStandalone()||NATIVE){if(b)b.remove();return}
- if(!b){b=document.createElement("button");b.id="instBtn";b.className="btn g";b.textContent="Installer l'app";
-  b.style.cssText="position:fixed;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:100;box-shadow:0 4px 0 var(--goldd),0 6px 20px rgba(0,0,0,.5);animation:pop .4s cubic-bezier(.2,1.6,.4,1)";
+ if(!b){b=document.createElement("button");b.id="instBtn";b.className="btn g";b.textContent="Installer";
+  b.style.cssText="position:fixed;right:18px;top:calc(66px + env(safe-area-inset-top));padding:6px 10px;font-size:11px;z-index:100;box-shadow:0 4px 0 var(--goldd),0 6px 20px rgba(0,0,0,.5);animation:pop .4s cubic-bezier(.2,1.6,.4,1)";
   b.onclick=doInstall;document.body.appendChild(b)}
 }
 async function doInstall(){
@@ -935,7 +1054,7 @@ const isFresh=()=>!Object.values(S.days).some(r=>Object.keys(r.m||{}).length||Ob
 let pendingImport=null;
 window.gqImport=async t=>{try{const d=await unpackSave(t);if(!d.days||!d.cats)throw 0;pendingImport=d;
  if(isFresh())doImport();else sheet(`<div class="b" style="font-size:17px;margin-bottom:8px">Progression reçue</div><div class="sm dim" style="margin-bottom:14px">Remplacer la progression de l'app par celle du navigateur ?</div><button class="btn m" style="width:100%" data-act="doimport">Remplacer</button><button class="btn alt" style="width:100%;margin-top:10px" data-act="close">Garder celle de l'app</button>`)}catch(e){toast("Transfert impossible")}};
-function doImport(){if(!pendingImport)return;S=pendingImport;pendingImport=null;save();load();save();S.settings.transferAsked=true;save();closeSheet();render();remSync();overlay("PROGRESSION RÉCUPÉRÉE","Tout est là, bon jeu !",S.wear);SFX.level()}
+function doImport(){if(!pendingImport)return;S=pendingImport;pendingImport=null;save();load();save();S.settings.transferAsked=true;save();closeSheet();render();remSync();overlay("PROGRESSION RÉCUPÉRÉE","Tout est là, bon jeu !",W());SFX.level()}
 function vRealApp(){S.settings.realAsked=true;save();prepPack();
  sheet(`<div class="b" style="font-size:17px;margin-bottom:6px">Installe la vraie app</div><div class="sm dim" style="margin-bottom:14px">Rappels fiables même app fermée. Ta progression est récupérée automatiquement à la première ouverture.</div>
  <a class="btn g" style="display:block;text-align:center;text-decoration:none" href="${APK_URL}" onclick="copyPack()">1. Télécharger l'app Android</a>
@@ -946,6 +1065,11 @@ function vTransferAsk(){S.settings.transferAsked=true;save();
  sheet(`<div class="b" style="font-size:17px;margin-bottom:6px">Bienvenue dans l'app !</div><div class="sm dim" style="margin-bottom:14px">Tu as déjà joué dans le navigateur ? Récupère ta progression en 1 touche.</div>
  <button class="btn m" style="width:100%" data-act="opentransfer">Récupérer ma progression</button><button class="btn alt" style="width:100%;margin-top:10px" data-act="close">Non, commencer</button>`)}
 function vSendAsk(){sheet(`<div class="b" style="font-size:17px;margin-bottom:6px">Envoyer vers l'app</div><div class="sm dim" style="margin-bottom:14px">Ta progression va être copiée dans l'app Android installée.</div><button class="btn m" style="width:100%" data-act="sendapp">Envoyer ma progression</button><button class="btn alt" style="width:100%;margin-top:10px" data-act="close">Annuler</button>`)}
+
+
+/* ===================== FILLE / GARCON ===================== */
+function genderCards(){return `<div class="row" style="gap:10px">${[["f","Fille",S.wear],["m","Garçon",S.wearM]].map(([g,l,w])=>`<button class="card" data-act="gender" data-v="${g}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--txt);font:inherit;${S.gender===g?"border:2px solid var(--gold)":""}">${charSVG(w,170,null,true)}<b>${l}</b></button>`).join("")}</div>`}
+function vGender(){sheet(`<div class="b" style="font-size:17px;margin-bottom:4px">Choisis ton perso</div><div class="sm dim" style="margin-bottom:12px">Modifiable à tout moment dans Réglages. Les coffres et la boutique s'adaptent.</div>${genderCards()}`)}
 
 /* ===================== FEUILLES ===================== */
 function sheet(html){document.getElementById("sheetIn").innerHTML=html;document.getElementById("sheet").classList.add("on")}
@@ -965,6 +1089,7 @@ function vDetail(id){
 function vSettings(){
  const s=S.settings;
  sheet(`<div class="row sb" style="margin-bottom:14px"><span class="b" style="font-size:17px">Réglages</span><button class="btn alt" data-act="close">Fermer</button></div>
+ <div class="row sb" data-act="setgender" style="margin-bottom:12px"><span class="b">Perso</span><span class="btn alt" style="padding:6px 12px">${S.gender==="m"?"Garçon":"Fille"}</span></div>
  <div class="row sb" data-act="sound" style="margin-bottom:12px"><span class="b">Bruitages</span><span class="sw ${s.sound?"on":""}"></span></div>
  <div class="row sb" data-act="remtoggle" style="margin-bottom:8px"><div><div class="b">Rappels</div><div class="sm dim">${s.rem?"Activés":"Désactivés"}</div></div><span class="sw ${s.rem?"on":""}"></span></div>
  <div id="remP" style="margin-bottom:14px">${remPicker(s.remN)}</div>
@@ -1018,8 +1143,8 @@ function act(fn,ev,kind){
  const K={ok:["jump","ok",8,15],part:["tilt","part",0,10],un:["sad","un",0,0],quest:["wave","quest",10,15],rest:["tilt","equip",0,0]}[kind];
  if(K){f.anim=K[0];f.sound=K[1];f.sparks=K[2];f.vib=K[3];f.say=kind==="quest"?"Quête accomplie !":kind==="rest"?"Repos bien mérité":SAY[kind]?pick(SAY[kind]):null}
  if(after.today.success&&!before.today.success){f.anim="jump";f.say="Jour validé, série sauvée !";f.sparks=14;f.sound="quest"}
- if(after.today.perfect&&!before.today.perfect){f.anim="dance";f.say="Journée parfaite !";f.sparks=22;f.sound="perfect";f.vib=[20,40,20];f.over=["JOURNÉE PARFAITE",`+${PERFECT_XP} XP . +${COIN_PERFECT} pièces`,S.wear]}
- if(after.level>before.level){f.over=[`NIVEAU ${after.level}`,titleOf(after.level),S.wear];f.overSound="level";f.overDelay=f.sound==="perfect"?900:350}
+ if(after.today.perfect&&!before.today.perfect){f.anim="dance";f.say="Journée parfaite !";f.sparks=22;f.sound="perfect";f.vib=[20,40,20];f.over=["JOURNÉE PARFAITE",`+${PERFECT_XP} XP . +${COIN_PERFECT} pièces`,W()]}
+ if(after.level>before.level){f.over=[`NIVEAU ${after.level}`,titleOf(after.level),W()];f.overSound="level";f.overDelay=f.sound==="perfect"?900:350}
  fx=f;render();
 }
 
@@ -1047,28 +1172,30 @@ document.addEventListener("click",ev=>{
   case"opentransfer":try{Android.openTransfer()}catch(e){}closeSheet();break;
   case"doimport":doImport();break;
   case"realapp":vRealApp();break;
+  case"gender":S.gender=v;save();SFX.equip();closeSheet();shopSel=null;fx={anim:"spin",sparks:12};render();setTimeout(startPrompts,400);break;
+  case"setgender":vGender();break;
   case"spin":doSpin();break;
   case"defi":{const r=dayRec(T);if(!r.defi)break;act(()=>{r.defi.done=!r.defi.done},ev,r.defi.done?"un":"quest");break}
   case"chest":{const k=+v,p=CHESTS[k][1];if(C.coins<p){SFX.err();toast("Pas assez de pièces");break}const it=grantRandom(k);if(!it){SFX.err();toast("Tout est déjà débloqué");break}S.spent+=p;save();render();
-   const pool=[];for(const c in CATALOG)CATALOG[c].forEach(x=>{if(x.r===k&&x.id!=="a_none")pool.push(x)});const cards=Array.from({length:52},()=>itemCard(pool[Math.floor(Math.random()*pool.length)]));const win=44;cards[win]=itemCard(it);
+   const pool=[];for(const c in CAT())CAT()[c].forEach(x=>{if(x.r===k&&x.id!=="a_none"&&x.id!=="ma_none")pool.push(x)});const cards=Array.from({length:52},()=>itemCard(pool[Math.floor(Math.random()*pool.length)]));const win=44;cards[win]=itemCard(it);
    openReel(cards,win,()=>rewardOverlay(it,"COFFRE OUVERT !"));break}
   case"dchest":{const r=dayRec(T);if(r.dchest){SFX.err();break}const val=rollDaily(),before=C.coins;r.dchest=val;save();render();
    const cards=Array.from({length:52},()=>coinCard(rollDaily()));const win=44;cards[win]=coinCard(val);
    openReel(cards,win,()=>{const o=document.getElementById("over");o.classList.remove("on");o.innerHTML="";C=compute();render();countCoins(before,C.coins);
-    if(val>=100){overlay("JACKPOT !",`+${val} pièces`,S.wear);SFX.legend()}else{toast(`+${val} pièces`);SFX.coin()}});break}
+    if(val>=100){overlay("JACKPOT !",`+${val} pièces`,W());SFX.legend()}else{toast(`+${val} pièces`);SFX.coin()}});break}
   case"mreroll":act(()=>{const r=dayRec(T);r.mr=(r.mr||0)+1;r.ml=null;mList(T)},ev,"part");break;
   case"reroll":act(()=>{const r=dayRec(T);r.rr=(r.rr||0)+1;r.sqList=null;r.sq={}},ev,"part");break;
   case"wq":{const q=weekQuest(C.curWk),was=!!q.w.doneDate;act(()=>{q.w.n=Math.max(0,Math.min(q.target,q.w.n+(+v)));if(q.w.n>=q.target&&!q.w.doneDate)q.w.doneDate=T;else if(q.w.n<q.target)q.w.doneDate=null},ev,+v>0?"part":"un");
-   if(!was&&q.w.doneDate){SFX.perfect();overlay("QUÊTE ACCOMPLIE",`+${COIN_WQ} pièces . +${WQ_XP} XP`,S.wear)}break}
+   if(!was&&q.w.doneDate){SFX.perfect();overlay("QUÊTE ACCOMPLIE",`+${COIN_WQ} pièces . +${WQ_XP} XP`,W())}break}
   case"mood":act(()=>{dayRec(T).mood=+v;autoJournal()},ev,+v>=6?"ok":"part");break;
   case"jsave":{const r=dayRec(T);if(!r.mood||r.j.some(l=>!l.trim())){SFX.err();floatAt("Humeur + 3 lignes",ev.clientX-50,ev.clientY,"#ff7eb6");break}act(autoJournal,ev,"ok");break}
   case"scat":shopCat=v;shopPage=0;shopSel=null;SFX.page();render();break;
   case"pick":shopSel=v;fx={anim:"spin",sound:"page"};render();break;
-  case"page":{const n=Math.ceil(CATALOG[shopCat].length/15);shopPage=Math.max(0,Math.min(n-1,shopPage+(+v)));SFX.page();render();break}
-  case"buy":{const it=ITEM[v];if(!it||C.coins<it.price||S.owned.includes(v)){SFX.err();break}const from=C.coins;S.spent+=it.price;S.owned.push(v);S.wear[it.cat]=v;save();
+  case"page":{const n=Math.ceil(CAT()[shopCat].length/15);shopPage=Math.max(0,Math.min(n-1,shopPage+(+v)));SFX.page();render();break}
+  case"buy":{const it=ITEM[v];if(!it||C.coins<it.price||S.owned.includes(v)){SFX.err();break}const from=C.coins;S.spent+=it.price;S.owned.push(v);W()[it.cat]=v;save();
    fx={anim:"dance",sparks:24,coins:-it.price,coinFrom:from,sound:it.r===3?"legend":"buy",vib:[20,40,20],colors:[RARITY[it.r][1],"#fff"]};
-   if(it.r>=2){const w=Object.assign({},S.wear);fx.over=[it.r===3?"LÉGENDAIRE !":"ÉPIQUE !",it.name,w];fx.overDelay=500}render();break}
-  case"equip":S.wear[ITEM[v].cat]=v;save();fx={anim:"spin",sparks:10,sound:"equip"};render();break;
+   if(it.r>=2){const w=Object.assign({},W());fx.over=[it.r===3?"LÉGENDAIRE !":"ÉPIQUE !",it.name,w];fx.overDelay=500}render();break}
+  case"equip":W()[ITEM[v].cat]=v;save();fx={anim:"spin",sparks:10,sound:"equip"};render();break;
   case"compet":S.settings.compet=!S.settings.compet;save();SFX.tap();vSettings();break;
   case"catdel":if(S.cats.length>M_PER_DAY&&confirm("Supprimer cette mission ?")){S.cats.splice(+v,1);dayRec(T);save();vSettings()}break;
   case"catadd":S.cats.push({id:"c"+Date.now().toString(36),name:"Nouvelle mission"});dayRec(T);save();SFX.tap();vSettings();break;
@@ -1108,10 +1235,11 @@ function fitApp(){const h=(window.visualViewport?visualViewport.height:innerHeig
 fitApp();addEventListener("resize",fitApp);addEventListener("orientationchange",()=>setTimeout(fitApp,300));addEventListener("pageshow",fitApp);if(window.visualViewport)visualViewport.addEventListener("resize",fitApp);setTimeout(fitApp,500);setTimeout(fitApp,1500);
 if(/[?&]r=/.test(location.search))history.replaceState(null,"",location.pathname);
 load();save();render();
-setTimeout(()=>{remSync();installBtn();if(location.search.includes("transfer=1")&&!NATIVE){history.replaceState(null,"",location.pathname);vSendAsk()}
+function startPrompts(){if(location.search.includes("transfer=1")&&!NATIVE){history.replaceState(null,"",location.pathname);vSendAsk()}
   else if(NATIVE&&!S.settings.transferAsked&&isFresh())setTimeout(()=>{if(isFresh()&&!S.settings.transferAsked)vTransferAsk()},2500)
   else if(!NATIVE&&isStandalone()&&isAndroid&&!S.settings.realAsked)vRealApp()
-  else if((NATIVE||(isStandalone()&&"Notification" in window))&&!S.settings.remAsked)vRemAsk()},1500);
+  else if((NATIVE||(isStandalone()&&"Notification" in window))&&!S.settings.remAsked)vRemAsk()}
+setTimeout(()=>{remSync();installBtn();if(!S.gender)vGender();else startPrompts()},1500);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)remSync()});
 </script>
 </body>
