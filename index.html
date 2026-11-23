@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="2.0.1";
+const APP_VERSION="2.0.2";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -770,7 +770,7 @@ function charSVG(w,h,vb,lite){
  const defs=`<defs><linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3ec"/><stop offset="1" stop-color="#ffe2d4"/></linearGradient>
  <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(col,.15)}"/><stop offset=".5" stop-color="${col}"/>${omb?`<stop offset=".72" stop-color="${shade(col,-.15)}"/><stop offset="1" stop-color="${omb}"/>`:`<stop offset="1" stop-color="${shade(col,-.3)}"/>`}</linearGradient>
  <linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(col,.18)}"/><stop offset="1" stop-color="${shade(col,-.3)}"/></linearGradient>
- <linearGradient id="${id}i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1145"/><stop offset=".45" stop-color="#7c3fd0"/><stop offset=".8" stop-color="#c58cff"/><stop offset="1" stop-color="#f3c6ff"/></linearGradient>
+ <linearGradient id="${id}i" x1="0" y1="0" x2="0" y2="1">${male?'<stop offset="0" stop-color="#14203a"/><stop offset=".45" stop-color="#35609c"/><stop offset=".8" stop-color="#7fb0dc"/><stop offset="1" stop-color="#cfe6f7"/>':'<stop offset="0" stop-color="#2a1145"/><stop offset=".45" stop-color="#7c3fd0"/><stop offset=".8" stop-color="#c58cff"/><stop offset="1" stop-color="#f3c6ff"/>'}</linearGradient>
  <radialGradient id="${id}c"><stop offset="0" stop-color="#ff7d9c" stop-opacity=".55"/><stop offset="1" stop-color="#ff7d9c" stop-opacity="0"/></radialGradient>
  <filter id="${id}f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.3"/></filter><filter id="${id}g" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
  <clipPath id="${id}sc"><path d="${G.SCL}"/></clipPath><clipPath id="${id}sl"><path d="${G.SLV_L}"/><path d="${G.SLV_R}"/></clipPath>
@@ -779,18 +779,18 @@ function charSVG(w,h,vb,lite){
  s+=`<g transform="rotate(-4 100 120)"><g class="hb">${hairSVG(H,X,"back")}</g></g>`+outfitBack(O.o,X);
  s+=pa(G.LEG_L,S,SKL)+pa(G.LEG_R,S,SKL);
  if(!lite)s+=pa("M92,240 L98,240 C97,270 96,300 95,384 L91,384 Z","#eeac98",0,0,`opacity=".5" ${X.F}`)+pa("M116,240 L122,240 C120,270 118,300 115,384 L111,384 Z","#eeac98",0,0,`opacity=".4" ${X.F}`)+ln("M86,306 Q90,310 94,307 M106,306 Q110,309 114,306","#c98e7a",.6,1)+`<ellipse cx="90" cy="303" rx="2.6" ry="1.2" fill="#fff" opacity=".5"/><ellipse cx="110" cy="303" rx="2.6" ry="1.2" fill="#fff" opacity=".5"/>`;
- s+=(/Sandales/.test(Fs.name)?pa(G.FOOT_L,S,SKL)+pa(G.FOOT_R,S,SKL):"")+pa(G.TORSO,S)+pa(G.NECK,S,SKL)+pa("M91,108 Q100,124 109,108 L109,122 Q100,127 91,122 Z","#e6a38f",0,0,'opacity=".6"');
+ s+=(/Sandales/.test(Fs.name)?pa(G.FOOT_L,S,SKL)+pa(G.FOOT_R,S,SKL):"")+pa(G.TORSO,S)+pa(male?"M89,100 L111,100 L112,134 L88,134 Z":G.NECK,S,SKL)+pa("M91,108 Q100,124 109,108 L109,122 Q100,127 91,122 Z","#e6a38f",0,0,'opacity=".6"');
  s+=pa(G.ARM_L,S,SKL)+pa(G.ARM_R,S,SKL);
  if(!lite)s+=ln("M74,150 C70,166 67,184 64,210",'#e6a38f',3,.45).replace("/>",` ${X.F}/>`)+ln("M130,165 C138,172 142,182 141,190",'#e6a38f',3,.45).replace("/>",` ${X.F}/>`);
  s+=Fs.f(Fs.c);
  s+=outfitSVG(O.o,X).replace(/url\(#__s\)/g,S)+BKs.f;
  s+=pa(G.HAND_L,S,SKL)+pa(G.HAND_R,S,SKL)+(lite?"":ln("M51,250 L51.6,256 M54.4,251 L54.8,257 M57,250 L57.4,255","#c98e7a",.45,1)+ln("M120,213 Q123,212 125,214","#c98e7a",.45,1));
  if(A.neck)s+=A.f(A.c);
- const BR=male?ln("M74,60 Q84,56 94,59",shade(H.d[6],-.4),1.8,.85)+ln("M126,60 Q116,56 106,59",shade(H.d[6],-.4),1.8,.85):"";const E=`<use href="#${id}e" transform="translate(84.5 80) scale(${male?.72:.8}) translate(-84.5 -78)"/>`,E2=`<use href="#${id}e" transform="translate(200,0) scale(-1,1) translate(84.5 80) scale(${male?.72:.8}) translate(-84.5 -78)"/>`;
- s+=`<g transform="rotate(-4 100 120)">`+pa(G.EAR,S,SKL)+pa(mir(G.EAR),S,SKL)+pa(G.FACE,S,SKL)+
+ const BR=male?pa("M72,66 L95,62 L95,65 L73,69 Z",shade(H.d[6],-.45),0,0,'opacity=".95"')+pa(mir("M72,66 L95,62 L95,65 L73,69 Z"),shade(H.d[6],-.45),0,0,'opacity=".95"'):"";const E=`<use href="#${id}e" transform="translate(84.5 80) scale(${male?".74 .58":.8}) translate(-84.5 -78)"/>`,E2=`<use href="#${id}e" transform="translate(200,0) scale(-1,1) translate(84.5 80) scale(${male?".74 .58":.8}) translate(-84.5 -78)"/>`;
+ s+=`<g transform="rotate(-4 100 120)">`+pa(G.EAR,S,SKL)+pa(mir(G.EAR),S,SKL)+pa(male?"M62,60 C62,34 80,26 100,26 C120,26 138,34 138,60 C138,80 135,92 128,101 L110,113 Q100,118 90,113 L72,101 C65,92 62,80 62,60 Z":G.FACE,S,SKL)+
   (lite?"":pa("M64,62 C72,74 86,70 100,68 C114,70 128,74 136,62 L136,54 L64,54 Z","#e8a491",0,0,`opacity=".6" ${X.F}`))+
   `<g class="ey">${E}</g><g class="ey">${E2}</g>`+
-  `<ellipse cx="77" cy="94" rx="10" ry="5" fill="url(#${id}c)" opacity="${male?.35:1}"/><ellipse cx="123" cy="94" rx="10" ry="5" fill="url(#${id}c)" opacity="${male?.35:1}"/>`+
+  `<ellipse cx="77" cy="94" rx="10" ry="5" fill="url(#${id}c)" opacity="${male?0:1}"/><ellipse cx="123" cy="94" rx="10" ry="5" fill="url(#${id}c)" opacity="${male?0:1}"/>`+
   (lite||male?"":ln("M73,95 L75,92 M76.5,95.5 L78.5,92.5 M80,95.5 L82,92.5 M120,95.5 L122,92.5 M123.5,95.5 L125.5,92.5 M127,95 L129,92","#ff6f8f",.5,.75))+
   ln("M100.6,92.6 L99.2,95.6","#cf8d7a",.8,1)+(male?ln("M96,103 Q100,104.6 104,103","#8a4a52",.9,1):ln("M95.5,102.6 Q98,104 100,102.8 Q102,104 104.5,102.6","#9b3c52",.9,1))+(male?"":pa("M97,103.6 Q100,107.4 103,103.6 Q100,104.8 97,103.6 Z","#c4566b",0,0,'opacity=".75"'))+
   `<g class="hf">${hairSVG(H,X,"front")}</g>`+BR+(A.f&&!A.neck?A.f(A.c):"")+`</g>`+FXs.front;
