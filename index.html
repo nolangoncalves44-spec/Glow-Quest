@@ -147,7 +147,7 @@ textarea{resize:none;height:84px}
 <script>
 "use strict";
 /* ===================== CONSTANTES JEU ===================== */
-const APP_VERSION="2.0.5";
+const APP_VERSION="2.0.6";
 const KEY="glowquest_v1";
 const DEFAULT_CATS=[{id:"m0",name:"Te coucher avant 23 h"},{id:"m1",name:"Dormir au moins 7 h"},{id:"m2",name:"Te lever à l'heure prévue, sans répéter le réveil"},{id:"m3",name:"20 min de sport (marche rapide, vélo, danse)"},{id:"m4",name:"30 squats et 20 pompes"},{id:"m5",name:"Marcher 6 000 pas"},{id:"m6",name:"10 min d'étirements ou de yoga"},{id:"m7",name:"Boire 1,5 L d'eau"},{id:"m8",name:"Manger 2 fruits et 1 légume"},{id:"m9",name:"Cuisiner un repas maison"},{id:"m10",name:"Zéro soda et zéro sucrerie"},{id:"calme",name:"10 min de méditation ou de respiration"},{id:"m12",name:"Pas de téléphone 30 min au réveil"},{id:"m13",name:"Pas d'écran 30 min avant de dormir"},{id:"m14",name:"Routine de soin matin et soir"},{id:"m15",name:"Être prête (douche, tenue) avant 10 h"},{id:"m16",name:"Ranger ta chambre 15 min"},{id:"m17",name:"Une tâche ménagère (lessive, vaisselle...)"},{id:"m18",name:"Une action concrète vers ton objectif"},{id:"m19",name:"45 min de travail sans distraction"},{id:"m20",name:"Lire 20 pages"},{id:"m21",name:"Apprendre 15 min (langue, tuto...)"},{id:"journal",name:"Journal : 3 lignes et humeur"},{id:"m23",name:"Appeler ou voir un proche"},{id:"m24",name:"Faire un compliment sincère"},{id:"m25",name:"Sortir prendre l'air 20 min"},{id:"m26",name:"Planifier demain (3 priorités)"},{id:"m27",name:"Noter tes dépenses du jour"},{id:"m28",name:"Trier : donner ou jeter 5 objets"},{id:"m29",name:"15 min juste pour toi (loisir)"}];
 const M_PER_DAY=5,M_PTS=20;
@@ -843,6 +843,9 @@ function load(){
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));storageOK=true}catch(e){storageOK=false}}
 const sumPts=()=>100;
 const mName=id=>{const c=S.cats.find(x=>x.id===id);return c?c.name:(DEFAULT_CATS.find(x=>x.id===id)||{name:id}).name};
+function slotInfo(){const h=new Date().getHours();if(h<8)return{d:addDays(today(),-1),k:2,next:"8 h"};return h<20?{d:today(),k:1,next:"20 h"}:{d:today(),k:2,next:"8 h"}}
+function slotRec(){const s=slotInfo(),r=dayRec(s.d);if(s.k===1)return r;if(!r.p2)r.p2={};return r.p2}
+function defiRec(){const s=slotInfo(),cur=slotRec();if(cur.defi)return cur;const p=s.k===2?dayRec(s.d):(S.days[addDays(s.d,-1)]||{}).p2;return p&&p.defi&&!p.defi.done?p:cur}
 function dayRec(k){if(!S.days[k])S.days[k]={m:{},sq:{},sqList:null,rr:0,j:["","",""],mood:null,rest:false};const r=S.days[k];if(k===today()){r.max=100;r.n=M_PER_DAY}return r}
 function mList(k){const r=dayRec(k);if(!r.ml||r.ml.some(id=>!S.cats.find(c=>c.id===id)&&!(r.m[id]&&r.m[id].s>0))){const R=rng(hash(k+"#m"+(r.mr||0))),pool=S.cats.map(c=>c.id),out=[];while(out.length<Math.min(M_PER_DAY,pool.length))out.push(pool.splice(Math.floor(R()*pool.length),1)[0]);r.ml=out;save()}return r.ml}
 function sqList(k){const r=dayRec(k);if(!r.sqList){const R=rng(hash(k+"#"+r.rr)),pool=SQ.map(q=>q.id),out=[];while(out.length<3)out.push(pool.splice(Math.floor(R()*pool.length),1)[0]);r.sqList=out;save()}return r.sqList}
@@ -863,7 +866,7 @@ function compute(){
   let mult=1,ret=0;if(success){streak++;mult=multFor(streak);if(retDate===d)ret=RETURN_XP}else if(!isT){if(streak>=3)retDate=addDays(d,1);streak=0}
   best=Math.max(best,streak);let qxp=0;
   if(r){for(const id in r.sq)if(r.sq[id]){qxp+=SQ_XP;coins+=COIN_SQ}for(const id in r.m){const s=r.m[id].s;coins+=s===2?COIN_MAIN:s===1?COIN_PART:0}}
-  if(r&&r.spin&&r.spin.c)coins+=r.spin.c;if(r&&r.dchest)coins+=r.dchest;if(r&&r.defi&&r.defi.done)coins+=DEFI_COINS;if(jFull(r))coins+=COIN_JOURNAL;
+  for(const q of r?[r,r.p2||{}]:[]){if(q.spin&&q.spin.c)coins+=q.spin.c;if(q.dchest)coins+=q.dchest;if(q.defi&&q.defi.done)coins+=DEFI_COINS}if(jFull(r))coins+=COIN_JOURNAL;
   const perfect=!!r&&!r.rest&&sc.perfect;if(perfect)coins+=COIN_PERFECT;coins+=(wqDone[d]||0)*COIN_WQ;
   const xp=Math.round(pct*mult)+(perfect?PERFECT_XP:0)+qxp+ret+(wqDone[d]||0)*WQ_XP;total+=xp;
   const wk=weekKey(d);C.weekXP[wk]=(C.weekXP[wk]||0)+xp;C.days[d]={d,pct,success,perfect,xp,mult,ret,mood:r?r.mood:null,rec:r};C.order.push(d);
@@ -1004,17 +1007,17 @@ function wheelSVG(rot){
  <circle cx="100" cy="100" r="16" fill="#ffcf5a" stroke="#a8740f" stroke-width="3"/><path d="M100,-6 L90,12 L110,12 Z" fill="#fff" stroke="#140d2b" stroke-width="2"/></svg>`;
 }
 function vWheel(){
- const r=dayRec(today()),sp=r.spin,rot=sp?-(sp.idx*45):0;
- const res=sp?(sp.c?`Gagné : ${sp.c} pièce${sp.c>1?"s":""}`:sp.s?`Gagné : ${esc(ITEM[sp.s]?ITEM[sp.s].name:"un skin")}`:"Défi du jour débloqué"):"1 tour gratuit par jour";
+ const r=slotRec(),dr=defiRec(),sl=slotInfo(),sp=r.spin,rot=sp?-(sp.idx*45):0;
+ const res=sp?(sp.c?`Gagné : ${sp.c} pièce${sp.c>1?"s":""}`:sp.s?`Gagné : ${esc(ITEM[sp.s]?ITEM[sp.s].name:"un skin")}`:"Défi débloqué"):"1 tour à 8 h et 1 à 20 h";
  const remain=k=>{const all=[];for(const c in CAT())CAT()[c].forEach(it=>{if(it.r===k&&!/_none$/.test(it.id))all.push(it)});return[all.filter(it=>!S.owned.includes(it.id)).length,all.length]};
  return `<div class="row sb" style="flex:none"><span class="ttl">Roue de la chance</span><span class="sm dim b">${res}</span></div>
  <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
   <div id="wheelBox" style="height:min(34vh,250px);aspect-ratio:1">${wheelSVG(rot)}</div>
-  <button class="btn g" data-act="spin" ${sp?"disabled":""} style="min-width:180px">${sp?"Reviens demain":"Tourner"}</button></div>
- ${r.defi?`<div class="card row sb" style="flex:none"><div style="min-width:0"><div class="ttl">Défi du jour</div><div class="b" style="margin-top:4px">${esc(r.defi.t)}</div></div>
-  <button class="btn ${r.defi.done?"alt":"m"}" data-act="defi" style="flex:none">${r.defi.done?"Réussi":"+"+DEFI_COINS}</button></div>`:""}
+  <button class="btn g" data-act="spin" ${sp?"disabled":""} style="min-width:180px">${sp?"Reviens à "+sl.next:"Tourner"}</button></div>
+ ${dr.defi?`<div class="card row sb" style="flex:none"><div style="min-width:0"><div class="ttl">Défi</div><div class="b" style="margin-top:4px">${esc(dr.defi.t)}</div></div>
+  <button class="btn ${dr.defi.done?"alt":"m"}" data-act="defi" style="flex:none">${dr.defi.done?"Réussi":"+"+DEFI_COINS}</button></div>`:""}
  <div class="ttl" style="flex:none">Coffres</div>
- <div style="flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:5px">${chestTile("#6ee7c8","Jour",r.dchest?"Fait":"Gratuit",r.dchest?`+${r.dchest}`:"1 / jour",'data-act="dchest"',!!r.dchest)}${CHESTS.map(([k,p])=>{const[n,t]=remain(k);return chestTile(RARITY[k][1],RARITY[k][0].replace("Légendaire","Légende"),`<i class="coin" style="width:9px;height:9px"></i>${p}`,`${n}/${t}`,`data-act="chest" data-v="${k}"`,n===0||C.coins<p)}).join("")}</div>`;
+ <div style="flex:none;display:grid;grid-template-columns:repeat(5,1fr);gap:5px">${chestTile("#6ee7c8","Jour",r.dchest?"Fait":"Gratuit",r.dchest?`+${r.dchest}`:"8 h / 20 h",'data-act="dchest"',!!r.dchest)}${CHESTS.map(([k,p])=>{const[n,t]=remain(k);return chestTile(RARITY[k][1],RARITY[k][0].replace("Légendaire","Légende"),`<i class="coin" style="width:9px;height:9px"></i>${p}`,`${n}/${t}`,`data-act="chest" data-v="${k}"`,n===0||C.coins<p)}).join("")}</div>`;
 }
 function chestTile(c,name,price,sub,attr,off){return `<button class="tile" ${attr} style="border:1px solid ${c}66;color:var(--txt);font:inherit;padding:6px 2px;${off?"opacity:.45":""}"><svg viewBox="0 0 40 32" width="34" height="27"><rect x="4" y="12" width="32" height="18" rx="3" fill="${c}" stroke="#140d2b" stroke-width="1.5"/><path d="M4,14 Q4,4 20,4 Q36,4 36,14 Z" fill="${shade(c,.25)}" stroke="#140d2b" stroke-width="1.5"/><rect x="17" y="12" width="6" height="8" rx="1.5" fill="#fff" stroke="#140d2b" stroke-width="1"/></svg><b style="font-size:10px;color:${c};display:block">${name}</b><span class="row" style="justify-content:center;gap:2px;font-size:10px">${price}</span><span style="font-size:9px">${sub}</span></button>`}
 /* ouverture façon roulette horizontale */
@@ -1043,7 +1046,7 @@ function rewardOverlay(it,title){const w=Object.assign({},W(),{[it.cat]:it.id});
  SFX[it.r>=3?"legend":it.r===2?"perfect":"buy"]();}
 let spinning=false;
 function doSpin(){
- const T=today(),r=dayRec(T);if(r.spin||spinning)return;spinning=true;
+ const r=slotRec();if(r.spin||spinning)return;spinning=true;
  const idx=Math.floor(Math.random()*WHEEL.length),w=WHEEL[idx],sp={idx};
  if(w.c)sp.c=w.c;if(w.d)r.defi={t:DEFIS[Math.floor(Math.random()*DEFIS.length)],done:false};
  if(w.s){const roll=Math.random(),k=roll<.6?0:roll<.88?1:roll<.98?2:3;let it=grantRandom(k);for(let j=0;!it&&j<4;j++)it=grantRandom(j);if(it)sp.s=it.id;else sp.c=10}
@@ -1258,11 +1261,11 @@ document.addEventListener("click",ev=>{
   case"gender":S.gender=v;save();SFX.equip();closeSheet();shopSel=null;fx={anim:"spin",sparks:12};render();setTimeout(startPrompts,400);break;
   case"setgender":vGender();break;
   case"spin":doSpin();break;
-  case"defi":{const r=dayRec(T);if(!r.defi)break;act(()=>{r.defi.done=!r.defi.done},ev,r.defi.done?"un":"quest");break}
+  case"defi":{const r=defiRec();if(!r.defi)break;act(()=>{r.defi.done=!r.defi.done},ev,r.defi.done?"un":"quest");break}
   case"chest":{const k=+v,p=CHESTS[k][1];if(C.coins<p){SFX.err();toast("Pas assez de pièces");break}const it=grantRandom(k);if(!it){SFX.err();toast("Tout est déjà débloqué");break}S.spent+=p;save();render();
    const pool=[];for(const c in CAT())CAT()[c].forEach(x=>{if(x.r===k&&!/_none$/.test(x.id))pool.push(x)});const cards=Array.from({length:52},()=>itemCard(pool[Math.floor(Math.random()*pool.length)]));const win=44;cards[win]=itemCard(it);
    openReel(cards,win,()=>rewardOverlay(it,"COFFRE OUVERT !"));break}
-  case"dchest":{const r=dayRec(T);if(r.dchest){SFX.err();break}const val=rollDaily(),before=C.coins;r.dchest=val;save();render();
+  case"dchest":{const r=slotRec();if(r.dchest){SFX.err();break}const val=rollDaily(),before=C.coins;r.dchest=val;save();render();
    const cards=Array.from({length:52},()=>coinCard(rollDaily()));const win=44;cards[win]=coinCard(val);
    openReel(cards,win,()=>{const o=document.getElementById("over");o.classList.remove("on");o.innerHTML="";C=compute();render();countCoins(before,C.coins);
     if(val>=100){overlay("JACKPOT !",`+${val} pièces`,W());SFX.legend()}else{toast(`+${val} pièces`);SFX.coin()}});break}
@@ -1302,9 +1305,9 @@ document.getElementById("importFile").addEventListener("change",ev=>{
  const f=ev.target.files[0];if(!f)return;const rd=new FileReader();
  rd.onload=()=>{try{const d=JSON.parse(rd.result);if(!d.days||!d.cats)throw 0;S=d;save();load();save();closeSheet();render();alert("Sauvegarde importée.")}catch(e){alert("Fichier invalide.")}};rd.readAsText(f);ev.target.value="";
 });
-let lastDay=today();
-document.addEventListener("visibilitychange",()=>{if(!document.hidden){lastDay=today();render()}});
-setInterval(()=>{if(today()!==lastDay){lastDay=today();render()}},60000);
+const slotKey=()=>{const s=slotInfo();return today()+s.d+s.k};let lastDay=slotKey();
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){lastDay=slotKey();render()}});
+setInterval(()=>{if(slotKey()!==lastDay){lastDay=slotKey();render()}},60000);
 /* ===================== MISE A JOUR (service worker) ===================== */
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")){
  navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(reg=>{
